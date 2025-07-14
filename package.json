@@ -1,0 +1,18 @@
+{
+  "name": "mortgage-website-platform",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "services/*",
+    "libs/*"
+  ],
+  "description": "This is a full-stack mortgage application platform built using React.js for the frontend and Node.js/Express for the backend. Features include mortgage calculators, pre-qualification application forms, lead management dashboard, and compliance support for mortgage brokers and lenders.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
