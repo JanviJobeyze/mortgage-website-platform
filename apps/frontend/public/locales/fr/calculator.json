@@ -1,0 +1,57 @@
+{
+  "title": "Calculateur d'Hypothèque",
+  "subtitle": "Calculez vos paiements hypothécaires et explorez différents scénarios avec notre calculateur complet.",
+  
+  "loanDetails": {
+    "title": "Détails du Prêt",
+    "homePrice": "Prix de la Maison",
+    "homePricePlaceholder": "Entrez le prix de la maison",
+    "downPayment": "Mise de Fond",
+    "downPaymentPlaceholder": "Entrez le montant de la mise de fond",
+    "downPaymentPercent": "Mise de Fond (%)",
+    "downPaymentPercentPlaceholder": "Entrez le pourcentage de mise de fond",
+    "interestRate": "Taux d'Intérêt (%)",
+    "interestRatePlaceholder": "Entrez le taux d'intérêt",
+    "amortizationPeriod": "Période d'Amortissement (Années)",
+    "amortizationPeriodPlaceholder": "Entrez la période d'amortissement",
+    "paymentFrequency": "Fréquence de Paiement",
+    "province": "Province"
+  },
+  
+  "paymentFrequency": {
+    "monthly": "Mensuel",
+    "biweekly": "Bi-hebdomadaire",
+    "weekly": "Hebdomadaire"
+  },
+  
+  "provinces": {
+    "ON": "Ontario",
+    "BC": "Colombie-Britannique",
+    "AB": "Alberta",
+    "QC": "Québec",
+    "NS": "Nouvelle-Écosse",
+    "NB": "Nouveau-Brunswick",
+    "MB": "Manitoba",
+    "SK": "Saskatchewan",
+    "PE": "Île-du-Prince-Édouard",
+    "NL": "Terre-Neuve-et-Labrador",
+    "NT": "Territoires du Nord-Ouest",
+    "NU": "Nunavut",
+    "YT": "Yukon"
+  },
+  
+  "results": {
+    "title": "Résultats du Calcul",
+    "monthlyPayment": "Paiement Mensuel",
+    "totalPayment": "Paiement Total",
+    "totalInterest": "Intérêt Total",
+    "amortizationSchedule": "Échéancier d'Amortissement"
+  },
+  
+  "buttons": {
+    "calculate": "Calculer",
+    "reset": "Réinitialiser",
+    "download": "Télécharger PDF",
+    "share": "Partager"
+  }
+} 

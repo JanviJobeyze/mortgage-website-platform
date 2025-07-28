@@ -1,0 +1,94 @@
+{
+  "title": "Cuestionario de Precalificación",
+  "subtitle": "Descubramos cuánto puede pagar en menos de 2 minutos",
+  "stepIndicator": "Paso {current} de {total}",
+  "progressComplete": "{percent}% Completado",
+  
+  "welcome": {
+    "title": "¡Bienvenido! Empecemos",
+    "description": "Este cuestionario rápido nos ayudará a entender su situación financiera y proporcionarle una estimación precisa de precalificación.",
+    "requirementsTitle": "Lo que necesitará:",
+    "requirements": [
+      "Su ingreso anual",
+      "Su rango de puntaje de crédito",
+      "Su pago inicial",
+      "Sus pagos mensuales de deudas"
+    ],
+    "privacyNote": "Su información está segura y solo se usará para esta estimación de precalificación."
+  },
+  
+  "personalInfo": {
+    "title": "Información Personal",
+    "firstName": "Nombre",
+    "firstNamePlaceholder": "Ingrese su nombre",
+    "lastName": "Apellido",
+    "lastNamePlaceholder": "Ingrese su apellido",
+    "email": "Dirección de Correo Electrónico",
+    "emailPlaceholder": "Ingrese su dirección de correo electrónico"
+  },
+  
+  "financialInfo": {
+    "title": "Información Financiera",
+    "annualIncome": "Ingreso Anual",
+    "annualIncomePlaceholder": "Ingrese su ingreso anual",
+    "employmentStatus": "Estado de Empleo",
+    "employmentOptions": {
+      "fullTime": "Empleado de Tiempo Completo",
+      "partTime": "Empleado de Tiempo Parcial",
+      "selfEmployed": "Trabajador Independiente",
+      "contractor": "Contratista",
+      "retired": "Jubilado"
+    },
+    "creditScore": "Rango de Puntaje de Crédito",
+    "creditScoreOptions": {
+      "excellent": "Excelente (750+)",
+      "good": "Bueno (700-749)",
+      "fair": "Regular (650-699)",
+      "poor": "Malo (600-649)",
+      "veryPoor": "Muy Malo (<600)"
+    }
+  },
+  
+  "propertyInfo": {
+    "title": "Propiedad y Pago Inicial",
+    "downPayment": "Monto del Pago Inicial",
+    "downPaymentPlaceholder": "Ingrese el monto de su pago inicial",
+    "monthlyDebts": "Pagos Mensuales de Deudas",
+    "monthlyDebtsPlaceholder": "Ingrese sus pagos mensuales totales de deudas",
+    "debtNote": "Incluya préstamos de auto, tarjetas de crédito, préstamos estudiantiles, etc."
+  },
+  
+  "review": {
+    "title": "Revise Su Información",
+    "description": "Por favor revise su información antes de que calculemos su precalificación.",
+    "yourInfo": "Su Información:",
+    "fields": {
+      "name": "Nombre:",
+      "email": "Correo Electrónico:",
+      "annualIncome": "Ingreso Anual:",
+      "employment": "Empleo:",
+      "creditScore": "Puntaje de Crédito:",
+      "downPayment": "Pago Inicial:",
+      "monthlyDebts": "Deudas Mensuales:"
+    },
+    "nextStepsTitle": "Lo que sigue:",
+    "nextSteps": [
+      "Reciba su estimación de precalificación",
+      "Obtenga recomendaciones de hipotecas personalizadas",
+      "Conéctese con un especialista en hipotecas",
+      "Sin obligación, sin verificación de crédito requerida"
+    ]
+  },
+  
+  "navigation": {
+    "back": "Atrás",
+    "next": "Siguiente",
+    "getResults": "Obtener Resultados"
+  },
+  
+  "validation": {
+    "required": "Este campo es requerido",
+    "invalidEmail": "Por favor ingrese una dirección de correo electrónico válida",
+    "invalidAmount": "Por favor ingrese un monto válido"
+  }
+} 

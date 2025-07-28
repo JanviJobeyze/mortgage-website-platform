@@ -1,0 +1,57 @@
+{
+  "title": "Calculadora de Hipoteca",
+  "subtitle": "Calcule sus pagos hipotecarios y explore diferentes escenarios con nuestra calculadora integral.",
+  
+  "loanDetails": {
+    "title": "Detalles del Préstamo",
+    "homePrice": "Precio de la Casa",
+    "homePricePlaceholder": "Ingrese el precio de la casa",
+    "downPayment": "Pago Inicial",
+    "downPaymentPlaceholder": "Ingrese el monto del pago inicial",
+    "downPaymentPercent": "Pago Inicial (%)",
+    "downPaymentPercentPlaceholder": "Ingrese el porcentaje del pago inicial",
+    "interestRate": "Tasa de Interés (%)",
+    "interestRatePlaceholder": "Ingrese la tasa de interés",
+    "amortizationPeriod": "Período de Amortización (Años)",
+    "amortizationPeriodPlaceholder": "Ingrese el período de amortización",
+    "paymentFrequency": "Frecuencia de Pago",
+    "province": "Provincia"
+  },
+  
+  "paymentFrequency": {
+    "monthly": "Mensual",
+    "biweekly": "Quincenal",
+    "weekly": "Semanal"
+  },
+  
+  "provinces": {
+    "ON": "Ontario",
+    "BC": "Columbia Británica",
+    "AB": "Alberta",
+    "QC": "Quebec",
+    "NS": "Nueva Escocia",
+    "NB": "Nuevo Brunswick",
+    "MB": "Manitoba",
+    "SK": "Saskatchewan",
+    "PE": "Isla del Príncipe Eduardo",
+    "NL": "Terranova y Labrador",
+    "NT": "Territorios del Noroeste",
+    "NU": "Nunavut",
+    "YT": "Yukón"
+  },
+  
+  "results": {
+    "title": "Resultados del Cálculo",
+    "monthlyPayment": "Pago Mensual",
+    "totalPayment": "Pago Total",
+    "totalInterest": "Interés Total",
+    "amortizationSchedule": "Cronograma de Amortización"
+  },
+  
+  "buttons": {
+    "calculate": "Calcular",
+    "reset": "Restablecer",
+    "download": "Descargar PDF",
+    "share": "Compartir"
+  }
+} 

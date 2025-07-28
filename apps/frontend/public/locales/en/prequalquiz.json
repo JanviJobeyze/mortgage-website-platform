@@ -1,0 +1,94 @@
+{
+  "title": "Pre-Qualification Quiz",
+  "subtitle": "Let's find out how much you can afford in under 2 minutes",
+  "stepIndicator": "Step {current} of {total}",
+  "progressComplete": "{percent}% Complete",
+  
+  "welcome": {
+    "title": "Welcome! Let's get started",
+    "description": "This quick quiz will help us understand your financial situation and provide you with an accurate pre-qualification estimate.",
+    "requirementsTitle": "What you'll need:",
+    "requirements": [
+      "Your annual income",
+      "Your credit score range",
+      "Your down payment amount",
+      "Your monthly debt payments"
+    ],
+    "privacyNote": "Your information is secure and will only be used for this pre-qualification estimate."
+  },
+  
+  "personalInfo": {
+    "title": "Personal Information",
+    "firstName": "First Name",
+    "firstNamePlaceholder": "Enter your first name",
+    "lastName": "Last Name", 
+    "lastNamePlaceholder": "Enter your last name",
+    "email": "Email Address",
+    "emailPlaceholder": "Enter your email address"
+  },
+  
+  "financialInfo": {
+    "title": "Financial Information",
+    "annualIncome": "Annual Income",
+    "annualIncomePlaceholder": "Enter your annual income",
+    "employmentStatus": "Employment Status",
+    "employmentOptions": {
+      "fullTime": "Full-time Employee",
+      "partTime": "Part-time Employee", 
+      "selfEmployed": "Self-employed",
+      "contractor": "Contractor",
+      "retired": "Retired"
+    },
+    "creditScore": "Credit Score Range",
+    "creditScoreOptions": {
+      "excellent": "Excellent (750+)",
+      "good": "Good (700-749)",
+      "fair": "Fair (650-699)", 
+      "poor": "Poor (600-649)",
+      "veryPoor": "Very Poor (<600)"
+    }
+  },
+  
+  "propertyInfo": {
+    "title": "Property & Down Payment",
+    "downPayment": "Down Payment Amount",
+    "downPaymentPlaceholder": "Enter your down payment amount",
+    "monthlyDebts": "Monthly Debt Payments",
+    "monthlyDebtsPlaceholder": "Enter your total monthly debt payments",
+    "debtNote": "Include car loans, credit cards, student loans, etc."
+  },
+  
+  "review": {
+    "title": "Review Your Information",
+    "description": "Please review your information before we calculate your pre-qualification.",
+    "yourInfo": "Your Information:",
+    "fields": {
+      "name": "Name:",
+      "email": "Email:",
+      "annualIncome": "Annual Income:",
+      "employment": "Employment:",
+      "creditScore": "Credit Score:",
+      "downPayment": "Down Payment:",
+      "monthlyDebts": "Monthly Debts:"
+    },
+    "nextStepsTitle": "What happens next:",
+    "nextSteps": [
+      "Receive your pre-qualification estimate",
+      "Get personalized mortgage recommendations", 
+      "Connect with a mortgage specialist",
+      "No obligation, no credit check required"
+    ]
+  },
+  
+  "navigation": {
+    "back": "Back",
+    "next": "Next",
+    "getResults": "Get Results"
+  },
+  
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Please enter a valid email address",
+    "invalidAmount": "Please enter a valid amount"
+  }
+} 

@@ -1,14 +1,66 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import VoiceBotIcon from '../assets/chat.png';
 import ChatBotIcon from '../assets/Marie_Dubois.png';
+import { faqKnowledgeBase, findBestFAQMatch, generateResponse } from '../data/faqData';
 
 function ChatBot() {
   const [isVoiceBotOpen, setIsVoiceBotOpen] = useState(false);
   const [chatMessage, setChatMessage] = useState('');
   const [chatMessages, setChatMessages] = useState([
-    { type: 'bot', message: 'Hello! How can I help you with your mortgage needs today?' }
+    { 
+      type: 'bot', 
+      message: 'Hello! I\'m your mortgage assistant. I can help you with questions about pre-approval, rates, documents, and more. What would you like to know?',
+      source: 'Welcome message'
+    }
   ]);
   const [isTyping, setIsTyping] = useState(false);
+
+  // Listen for FAQ page questions
+  useEffect(() => {
+    const handleFAQQuestion = (event) => {
+      console.log('ChatBot: Received FAQ question event:', event.detail);
+      const { question, category } = event.detail;
+      
+      // Open chatbot if not already open
+      setIsVoiceBotOpen(true);
+      
+      // Add user question
+      const userMessage = { type: 'user', message: question };
+      setChatMessages(prev => [...prev, userMessage]);
+      setIsTyping(true);
+      
+      // Find matching FAQ and respond
+      setTimeout(() => {
+        const matchedFAQ = faqKnowledgeBase.find(faq => 
+          faq.question.toLowerCase() === question.toLowerCase() ||
+          faq.category === category
+        );
+        
+        console.log('ChatBot: Matched FAQ:', matchedFAQ);
+        
+        const response = matchedFAQ 
+          ? { message: matchedFAQ.answer, source: `From our FAQ: "${matchedFAQ.question}"`, category: matchedFAQ.category }
+          : generateResponse(question);
+        
+        const botResponse = { 
+          type: 'bot', 
+          message: response.message,
+          source: response.source,
+          category: response.category
+        };
+        
+        setChatMessages(prev => [...prev, botResponse]);
+        setIsTyping(false);
+      }, 1500);
+    };
+
+    console.log('ChatBot: Setting up event listener for openChatbot');
+    window.addEventListener('openChatbot', handleFAQQuestion);
+    
+    return () => {
+      window.removeEventListener('openChatbot', handleFAQQuestion);
+    };
+  }, []);
 
   const toggleVoiceBot = () => {
     setIsVoiceBotOpen(!isVoiceBotOpen);
@@ -25,15 +77,21 @@ function ChatBot() {
     setChatMessage('');
     setIsTyping(true);
 
-    // Simulate bot response
+    // Process the question and find best match
     setTimeout(() => {
+      const matchedFAQ = findBestFAQMatch(chatMessage);
+      const response = generateResponse(chatMessage, matchedFAQ);
+      
       const botResponse = { 
         type: 'bot', 
-        message: 'Thank you for your question! Our mortgage specialists will help you find the best rates and terms for your needs.' 
+        message: response.message,
+        source: response.source,
+        category: response.category
       };
+      
       setChatMessages(prev => [...prev, botResponse]);
       setIsTyping(false);
-    }, 2000);
+    }, 1500);
   };
 
   const handleQuickQuestion = (question) => {
@@ -44,19 +102,19 @@ function ChatBot() {
     setIsTyping(true);
 
     setTimeout(() => {
-      let response = '';
-      if (question.includes('rates')) {
-        response = 'Current mortgage rates start from 2.89% for 5-year fixed terms. Rates vary based on your credit score and down payment.';
-      } else if (question.includes('afford')) {
-        response = 'Use our calculator above to estimate your affordability. Generally, your housing costs should not exceed 32% of your gross income.';
-      } else {
-        response = 'We offer several first-time buyer programs including RRSP HBP assistance and land transfer tax credits.';
-      }
+      const matchedFAQ = findBestFAQMatch(question);
+      const response = generateResponse(question, matchedFAQ);
       
-      const botResponse = { type: 'bot', message: response };
+      const botResponse = { 
+        type: 'bot', 
+        message: response.message,
+        source: response.source,
+        category: response.category
+      };
+      
       setChatMessages(prev => [...prev, botResponse]);
       setIsTyping(false);
-    }, 2000);
+    }, 1500);
   };
 
   return (
@@ -103,7 +161,7 @@ function ChatBot() {
             </div>
             <div>
               <h4 className="font-semibold text-[#212121]">Mortgage Assistant</h4>
-              <p className="text-sm text-[#757575]">Ask me anything about mortgages</p>
+              <p className="text-sm text-[#757575]">Powered by FAQ knowledge base</p>
             </div>
           </div>
 
@@ -119,6 +177,11 @@ function ChatBot() {
                   }
                 `}>
                   {msg.message}
+                  {msg.source && msg.type === 'bot' && (
+                    <div className="mt-2 text-xs text-[#6B7280] italic">
+                      {msg.source}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -142,22 +205,22 @@ function ChatBot() {
             <p className="text-xs text-[#757575] mb-2">Quick questions:</p>
             <div className="space-y-1">
               <button 
-                onClick={() => handleQuickQuestion("What are current mortgage rates?")}
+                onClick={() => handleQuickQuestion("What is mortgage pre-approval?")}
                 className="w-full text-left p-2 rounded-lg hover:bg-[#F5F5F5] text-xs text-[#374151] transition-colors"
               >
-                💰 What are current mortgage rates?
+                📋 What is mortgage pre-approval?
               </button>
               <button 
-                onClick={() => handleQuickQuestion("How much can I afford?")}
+                onClick={() => handleQuickQuestion("How much down payment do I need?")}
                 className="w-full text-left p-2 rounded-lg hover:bg-[#F5F5F5] text-xs text-[#374151] transition-colors"
               >
-                🏠 How much can I afford?
+                💰 How much down payment do I need?
               </button>
               <button 
-                onClick={() => handleQuickQuestion("Tell me about first-time buyer programs")}
+                onClick={() => handleQuickQuestion("What credit score do I need?")}
                 className="w-full text-left p-2 rounded-lg hover:bg-[#F5F5F5] text-xs text-[#374151] transition-colors"
               >
-                🔰 First-time buyer programs
+                📊 What credit score do I need?
               </button>
             </div>
           </div>
@@ -169,7 +232,7 @@ function ChatBot() {
                 type="text"
                 value={chatMessage}
                 onChange={(e) => setChatMessage(e.target.value)}
-                placeholder="Type your message..."
+                placeholder="Ask about mortgages..."
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1B5E20] focus:border-transparent text-sm bg-[#FFFFFF] text-[#9CA3AF]"
               />
               <button
