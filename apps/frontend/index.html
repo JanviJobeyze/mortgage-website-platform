@@ -2,12 +2,149 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/manifest.json" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#1e40af" />
+    
+    <!-- SEO Meta Tags -->
+    <title>MortgageLink Canada | Best Mortgage Rates & Expert Home Loan Services</title>
+    <meta name="description" content="Get the best mortgage rates in Canada with MortgageLink's expert guidance. FSRA licensed broker offering home loans, refinancing, and HELOC with multilingual support across all provinces." />
+    <meta name="keywords" content="MortgageLink Canada, mortgage rates Canada, best mortgage rates, home loans, first time home buyer, refinancing, HELOC, mortgage calculator, pre-approval, FSRA licensed, Canadian mortgage broker, multilingual mortgage services" />
+    <meta name="author" content="MortgageLink Canada" />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- Open Graph Meta Tags for Social Media -->
+    <meta property="og:title" content="MortgageLink Canada | Best Mortgage Rates & Expert Home Loan Services" />
+    <meta property="og:description" content="Get the best mortgage rates in Canada with MortgageLink's expert guidance. FSRA licensed broker offering home loans, refinancing, and HELOC with multilingual support across all provinces." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://mortgagelink.ca" />
+    <meta property="og:image" content="https://mortgagelink.ca/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="MortgageLink Canada - Your Trusted Mortgage Partner" />
+    <meta property="og:locale" content="en_CA" />
+    <meta property="og:site_name" content="MortgageLink Canada" />
+    <meta property="og:image:secure_url" content="https://mortgagelink.ca/og-image.jpg" />
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="MortgageLink Canada | Best Mortgage Rates & Expert Home Loan Services" />
+    <meta name="twitter:description" content="Get the best mortgage rates in Canada with MortgageLink's expert guidance. FSRA licensed broker offering home loans, refinancing, and HELOC with multilingual support across all provinces." />
+    <meta name="twitter:image" content="https://mortgagelink.ca/twitter-image.jpg" />
+    <meta name="twitter:image:alt" content="MortgageLink Canada - Your Trusted Mortgage Partner" />
+    <meta name="twitter:site" content="@mortgagelinkca" />
+    <meta name="twitter:creator" content="@mortgagelinkca" />
+    
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="CA" />
+    <meta name="geo.country" content="Canada" />
+    <meta name="geo.placename" content="Canada" />
+    <link rel="canonical" href="https://mortgagelink.ca" />
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="https://mortgagelink.ca/sitemap.xml" />
+    
+    <!-- Google Analytics 4 (GA4) -->
+    <!-- Replace GA_MEASUREMENT_ID with your actual GA4 Measurement ID -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'GA_MEASUREMENT_ID', {
+        page_title: document.title,
+        page_location: window.location.href,
+        send_page_view: true
+      });
+    </script>
+    
+    <!-- Structured Data for Local Business (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FinancialService",
+      "name": "MortgageLink Canada",
+      "description": "FSRA licensed mortgage brokerage providing comprehensive home loan services including purchase loans, refinancing, and HELOC solutions across Canada",
+      "url": "https://mortgagelink.ca",
+      "logo": "https://mortgagelink.ca/logo.png",
+      "telephone": "1-800-MORTGAGE",
+      "email": "info@mortgagelink.ca",
+      "areaServed": {
+        "@type": "Country",
+        "name": "Canada"
+      },
+      "serviceType": "Mortgage Brokerage",
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Mortgage Services",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "FinancialProduct",
+              "name": "Home Purchase Loans"
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "FinancialProduct",
+              "name": "Refinancing Services"
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "FinancialProduct",
+              "name": "Home Equity Line of Credit"
+            }
+          }
+        ]
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "CA"
+      }
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      // Register service worker for PWA functionality
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('Service Worker registered successfully:', registration);
+              
+              // Check for updates
+              registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    // New service worker available
+                    console.log('New service worker available');
+                    // You can show a notification to the user here
+                  }
+                });
+              });
+            })
+            .catch((error) => {
+              console.error('Service Worker registration failed:', error);
+            });
+        });
+      }
+      
+
+    </script>
   </body>
 </html>

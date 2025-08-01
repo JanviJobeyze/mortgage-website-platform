@@ -1,0 +1,57 @@
+{
+  "title": "બંધક કેલ્ક્યુલેટર",
+  "subtitle": "તમારા બંધક ભુગતાનની ગણતરી કરો અને અમારા વ્યાપક કેલ્ક્યુલેટર સાથે વિવિધ દૃશ્યોની શોધ કરો.",
+  
+  "loanDetails": {
+    "title": "લોન વિગતો",
+    "homePrice": "ઘરની કિંમત",
+    "homePricePlaceholder": "ઘરની કિંમત દાખલ કરો",
+    "downPayment": "ડાઉન પેમેન્ટ",
+    "downPaymentPlaceholder": "ડાઉન પેમેન્ટ રકમ દાખલ કરો",
+    "downPaymentPercent": "ડાઉન પેમેન્ટ (%)",
+    "downPaymentPercentPlaceholder": "ડાઉન પેમેન્ટ ટકાવારી દાખલ કરો",
+    "interestRate": "વ્યાજ દર (%)",
+    "interestRatePlaceholder": "વ્યાજ દર દાખલ કરો",
+    "amortizationPeriod": "પરિશોધન સમયગાળો (વર્ષ)",
+    "amortizationPeriodPlaceholder": "પરિશોધન સમયગાળો દાખલ કરો",
+    "paymentFrequency": "ભુગતાન આવર્તન",
+    "province": "પ્રાંત"
+  },
+  
+  "paymentFrequency": {
+    "monthly": "માસિક",
+    "biweekly": "દ્વિ-સાપ્તાહિક",
+    "weekly": "સાપ્તાહિક"
+  },
+  
+  "provinces": {
+    "ON": "ઓન્ટારિયો",
+    "BC": "બ્રિટિશ કોલમ્બિયા",
+    "AB": "અલ્બર્ટા",
+    "QC": "ક્વિબેક",
+    "NS": "નોવા સ્કોટિયા",
+    "NB": "ન્યૂ બ્રન્સવિક",
+    "MB": "મેનિટોબા",
+    "SK": "સાસ્કેચેવાન",
+    "PE": "પ્રિન્સ એડવર્ડ આઇલેન્ડ",
+    "NL": "ન્યૂફાઉન્ડલેન્ડ અને લેબ્રાડોર",
+    "NT": "ઉત્તર-પશ્ચિમી પ્રદેશ",
+    "NU": "નુનાવુત",
+    "YT": "યુકોન"
+  },
+  
+  "results": {
+    "title": "ગણતરી પરિણામો",
+    "monthlyPayment": "માસિક ભુગતાન",
+    "totalPayment": "કુલ ભુગતાન",
+    "totalInterest": "કુલ વ્યાજ",
+    "amortizationSchedule": "પરિશોધન યોજના"
+  },
+  
+  "buttons": {
+    "calculate": "ગણતરી કરો",
+    "reset": "રીસેટ કરો",
+    "download": "PDF ડાઉનલોડ કરો",
+    "share": "શેર કરો"
+  }
+} 

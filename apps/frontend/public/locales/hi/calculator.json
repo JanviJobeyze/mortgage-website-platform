@@ -1,0 +1,57 @@
+{
+  "title": "बंधक कैलकुलेटर",
+  "subtitle": "अपने बंधक भुगतान की गणना करें और हमारे व्यापक कैलकुलेटर के साथ विभिन्न परिदृश्यों का अन्वेषण करें।",
+  
+  "loanDetails": {
+    "title": "ऋण विवरण",
+    "homePrice": "घर की कीमत",
+    "homePricePlaceholder": "घर की कीमत दर्ज करें",
+    "downPayment": "डाउन पेमेंट",
+    "downPaymentPlaceholder": "डाउन पेमेंट राशि दर्ज करें",
+    "downPaymentPercent": "डाउन पेमेंट (%)",
+    "downPaymentPercentPlaceholder": "डाउन पेमेंट प्रतिशत दर्ज करें",
+    "interestRate": "ब्याज दर (%)",
+    "interestRatePlaceholder": "ब्याज दर दर्ज करें",
+    "amortizationPeriod": "परिशोधन अवधि (वर्ष)",
+    "amortizationPeriodPlaceholder": "परिशोधन अवधि दर्ज करें",
+    "paymentFrequency": "भुगतान आवृत्ति",
+    "province": "प्रांत"
+  },
+  
+  "paymentFrequency": {
+    "monthly": "मासिक",
+    "biweekly": "द्वि-साप्ताहिक",
+    "weekly": "साप्ताहिक"
+  },
+  
+  "provinces": {
+    "ON": "ओंटारियो",
+    "BC": "ब्रिटिश कोलंबिया",
+    "AB": "अल्बर्टा",
+    "QC": "क्वेबेक",
+    "NS": "नोवा स्कोटिया",
+    "NB": "न्यू ब्रंसविक",
+    "MB": "मैनिटोबा",
+    "SK": "सास्केचेवान",
+    "PE": "प्रिंस एडवर्ड आइलैंड",
+    "NL": "न्यूफाउंडलैंड और लैब्राडोर",
+    "NT": "उत्तर पश्चिमी क्षेत्र",
+    "NU": "नुनावुत",
+    "YT": "युकोन"
+  },
+  
+  "results": {
+    "title": "गणना परिणाम",
+    "monthlyPayment": "मासिक भुगतान",
+    "totalPayment": "कुल भुगतान",
+    "totalInterest": "कुल ब्याज",
+    "amortizationSchedule": "परिशोधन अनुसूची"
+  },
+  
+  "buttons": {
+    "calculate": "गणना करें",
+    "reset": "रीसेट करें",
+    "download": "PDF डाउनलोड करें",
+    "share": "साझा करें"
+  }
+} 

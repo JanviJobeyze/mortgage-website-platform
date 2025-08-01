@@ -1,0 +1,159 @@
+{
+  "header": {
+    "skipToContent": "Saltar al contenido principal",
+    "brandName": "MortgageLink",
+    "home": "Inicio",
+    "about": "Acerca de",
+    "loanServices": "Servicios de préstamo",
+    "calculator": "Calculadora",
+    "rates": "Tasas",
+    "news": "Noticias",
+    "faq": "Preguntas frecuentes",
+    "learningCentre": "Centro de aprendizaje",
+    "contact": "Contacto",
+    "selectLanguage": "Seleccionar idioma",
+    "language": "Idioma",
+    "currentLanguage": "Idioma actual",
+    "languageOptions": "Opciones de idioma",
+    "mobileLanguageOptions": "Opciones de idioma móvil",
+    "languageChanged": "Idioma cambiado a",
+    "toggleMobileMenu": "Alternar menú móvil",
+    "mobileNavigation": "Navegación móvil",
+    "mainNavigation": "Navegación principal"
+  },
+  "home": {
+    "tagline": "Encuentra tu mejor hipoteca",
+    "cta": "Comenzar solicitud",
+    "benefit1": "Tasas bajas",
+    "benefit2": "Aprobación rápida",
+    "benefit3": "Asesores de confianza",
+    "hero": {
+      "trustedBadge": "Confiado por 10,000+ familias canadienses",
+      "mainTitle": "Tu casa soñada",
+      "mainTitleHighlight": "comienza aquí",
+      "subtitle": "Obtén las mejores tasas hipotecarias en Canadá con nuestra orientación experta. Desde compradores primerizos hasta refinanciamiento, hacemos que la propiedad de vivienda sea accesible en todas las provincias.",
+      "currentBestRate": "Mejor tasa actual",
+      "fiveYearFixed": "5 años fijo",
+      "variableRate": "Tasa variable",
+      "primePlus": "Prime + 1.35%",
+      "getPreApproved": "Obtener pre-aprobación",
+      "calculatePayments": "Calcular pagos"
+    },
+    "calculator": {
+      "title": "Calculadora de pago rápido",
+      "loanAmount": "Monto del préstamo",
+      "downPayment": "Pago inicial",
+      "amortization": "Amortización",
+      "rate": "Tasa",
+      "monthlyPayment": "Pago mensual",
+      "viewDetailedCalculator": "Ver calculadora detallada"
+    },
+    "ctaCard": {
+      "title": "¿Cuánto puedes pagar?",
+      "subtitle": "Prueba nuestro quiz de pre-calificación gratuito en menos de 2 minutos.",
+      "button": "Comenzar"
+    },
+    "solutions": {
+      "title": "Soluciones hipotecarias integrales",
+      "subtitle": "Ya sea que estés comprando tu primera casa, refinanciando o invirtiendo en tu futuro, tenemos la experiencia para guiarte en cada paso del proceso.",
+      "homePurchase": {
+        "title": "Compra de casa",
+        "description": "¿Comprador primerizo o mudándose? Te conectamos con pre-calificaciones competitivas a través del proceso de compra.",
+        "learnMore": "Saber más"
+      },
+      "refinancing": {
+        "title": "Refinanciamiento",
+        "description": "Reduce tus pagos, consolida deudas o refinanciamiento de retiro. Te ayudamos a maximizar tu capital propio.",
+        "learnMore": "Saber más"
+      },
+      "homeEquity": {
+        "title": "Capital propio",
+        "description": "Libera el valor de tu casa con una línea de crédito hipotecaria o segunda hipoteca. Opciones. Renovaciones, inversiones o compras importantes.",
+        "learnMore": "Saber más"
+      }
+    },
+    "trusted": {
+      "title": "Confiado y regulado",
+      "subtitle": "Profesionales hipotecarios licenciados con cumplimiento regulatorio completo en todo Canadá.",
+      "osfiApproved": "Aprobado por OSFI",
+      "licensedInsured": "Licenciado/Asegurado",
+      "asLenders": "Como prestamistas",
+      "rateComparison": "Comparación de tasas"
+    },
+    "testimonials": {
+      "title": "Lo que dicen nuestros clientes",
+      "subtitle": "Confiado por familias en las principales comunidades de Canadá",
+      "previousTestimonial": "Testimonio anterior",
+      "nextTestimonial": "Testimonio siguiente",
+      "goToTestimonial": "Ir al testimonio"
+    },
+    "provinces": {
+      "title": "Experiencia específica de provincia",
+      "subtitle": "Conocimiento local y experiencia regulatoria en todo Canadá",
+      "ontario": {
+        "title": "Ontario",
+        "subtitle": "Licenciado por FSRA, asegurado y afianzado",
+        "features": [
+          "Crédito de impuesto de transferencia de tierras (Toronto y Ontario)",
+          "Guía de incentivo para compradores primerizos",
+          "Asistencia/inversión RAP"
+        ],
+        "button": "Explorar servicios de Ontario"
+      },
+      "britishColumbia": {
+        "title": "Columbia Británica",
+        "subtitle": "Vancouver, Victoria y Fraser Valley",
+        "features": [
+          "Cumplimiento del impuesto a compradores extranjeros",
+          "Programas hipotecarios para propietarios de BC",
+          "Tarifas RAP/apuestas de elegibilidad"
+        ],
+        "button": "Explorar servicios de BC"
+      }
+    },
+    "newsletter": {
+      "title": "Mantente actualizado sobre tasas hipotecarias",
+      "subtitle": "Recibe actualizaciones semanales de tasas, información del mercado y consejos hipotecarios exclusivos en tu bandeja de entrada.",
+      "placeholder": "Ingresa tu dirección de correo electrónico",
+      "button": "Suscribirse ahora",
+      "privacy": "Respetamos tu privacidad. Cancela la suscripción en cualquier momento."
+    }
+  },
+  "footer": {
+    "brandName": "MortgageLink Canada",
+    "companyDescription": "Corredor hipotecario licenciado que sirve a familias canadienses con orientación experta y soluciones confiables. Obtenga pre-aprobación, refinancie o encuentre su casa soñada con nosotros.",
+    "quickLinks": "Enlaces rápidos",
+    "contactInfo": "Información de contacto",
+    "phone": "1-800-MORTGAGE",
+    "email": "info@mortgagelink.ca",
+    "address": {
+      "line1": "123 Bay Street, Suite 1000",
+      "line2": "Toronto, ON M5J 2J1"
+    },
+    "compliance": {
+      "nmlsId": "ID NMLS:",
+      "nmlsNumber": "#123456",
+      "licensedBy": "Licenciado por la",
+      "financialConsumerAgency": "Agencia de Protección al Consumidor Financiero de Canadá",
+      "mortgageBrokerage": "Licencia de corretaje hipotecario en todas las provincias. Licenciado bajo la",
+      "mortgageBrokeragesAct": "Ley de Sociedades de Corretaje Hipotecario, Prestamistas y Administradores",
+      "equalHousing": "Igualdad de oportunidades de vivienda"
+    },
+    "importantNotice": {
+      "title": "Aviso importante:",
+      "content": "Esto no es un compromiso de préstamo. Las tasas, términos del programa y condiciones están sujetos a cambios sin previo aviso. No todos los solicitantes calificarán. Se aplican condiciones de propiedad. Todos los préstamos están sujetos a la aprobación de suscripción."
+    },
+    "equalHousing": {
+      "title": "Igualdad de oportunidades de vivienda:",
+      "content": "Nos comprometemos a proporcionar igualdad de oportunidades de vivienda independientemente de raza, color, religión, sexo, origen nacional, estado familiar o discapacidad. Cumplimos con la Ley Canadiense de Derechos Humanos y la legislación provincial de derechos humanos."
+    },
+    "privacy": {
+      "title": "Privacidad:",
+      "content": "Nos comprometemos a proteger su privacidad. Vea nuestra",
+      "privacyPolicy": "Política de Privacidad",
+      "forDetails": "para detalles sobre cómo recopilamos, usamos y protegemos su información."
+    },
+    "copyright": "© 2024 MortgageLink Canada. Todos los derechos reservados. Corretaje licenciado.",
+    "legalLinks": "Política de Privacidad | Términos de Servicio | Licencia"
+  }
+} 

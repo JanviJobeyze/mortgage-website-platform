@@ -1,0 +1,57 @@
+{
+  "title": "ਬੰਧਕ ਕੈਲਕੂਲੇਟਰ",
+  "subtitle": "ਆਪਣੇ ਬੰਧਕ ਭੁਗਤਾਨ ਦੀ ਗਣਨਾ ਕਰੋ ਅਤੇ ਸਾਡੇ ਵਿਆਪਕ ਕੈਲਕੂਲੇਟਰ ਨਾਲ ਵੱਖ-ਵੱਖ ਸੀਨਾਰੀਓ ਦੀ ਪੜਚੋਲ ਕਰੋ।",
+  
+  "loanDetails": {
+    "title": "ਲੋਨ ਵੇਰਵੇ",
+    "homePrice": "ਘਰ ਦੀ ਕੀਮਤ",
+    "homePricePlaceholder": "ਘਰ ਦੀ ਕੀਮਤ ਦਰਜ ਕਰੋ",
+    "downPayment": "ਡਾਊਨ ਪੇਮੈਂਟ",
+    "downPaymentPlaceholder": "ਡਾਊਨ ਪੇਮੈਂਟ ਰਕਮ ਦਰਜ ਕਰੋ",
+    "downPaymentPercent": "ਡਾਊਨ ਪੇਮੈਂਟ (%)",
+    "downPaymentPercentPlaceholder": "ਡਾਊਨ ਪੇਮੈਂਟ ਪ੍ਰਤੀਸ਼ਤ ਦਰਜ ਕਰੋ",
+    "interestRate": "ਬਿਆਜ ਦਰ (%)",
+    "interestRatePlaceholder": "ਬਿਆਜ ਦਰ ਦਰਜ ਕਰੋ",
+    "amortizationPeriod": "ਪਰਿਸ਼ੋਧਨ ਅਵਧੀ (ਸਾਲ)",
+    "amortizationPeriodPlaceholder": "ਪਰਿਸ਼ੋਧਨ ਅਵਧੀ ਦਰਜ ਕਰੋ",
+    "paymentFrequency": "ਭੁਗਤਾਨ ਆਵਿਰਤੀ",
+    "province": "ਸੂਬਾ"
+  },
+  
+  "paymentFrequency": {
+    "monthly": "ਮਹੀਨਾਵਾਰ",
+    "biweekly": "ਦੋ-ਹਫਤਾਵਾਰ",
+    "weekly": "ਹਫਤਾਵਾਰ"
+  },
+  
+  "provinces": {
+    "ON": "ਓਂਟਾਰੀਓ",
+    "BC": "ਬ੍ਰਿਟਿਸ਼ ਕੋਲੰਬੀਆ",
+    "AB": "ਅਲਬਰਟਾ",
+    "QC": "ਕਿਊਬੈਕ",
+    "NS": "ਨੋਵਾ ਸਕੋਸ਼ੀਆ",
+    "NB": "ਨਿਊ ਬ੍ਰਨਸਵਿਕ",
+    "MB": "ਮੈਨੀਟੋਬਾ",
+    "SK": "ਸਾਸਕਾਚੇਵਾਨ",
+    "PE": "ਪ੍ਰਿੰਸ ਐਡਵਰਡ ਆਈਲੈਂਡ",
+    "NL": "ਨਿਊਫਾਊਂਡਲੈਂਡ ਅਤੇ ਲੈਬਰਾਡੋਰ",
+    "NT": "ਉੱਤਰ-ਪੱਛਮੀ ਖੇਤਰ",
+    "NU": "ਨੂਨਾਵੁਤ",
+    "YT": "ਯੂਕੋਨ"
+  },
+  
+  "results": {
+    "title": "ਗਣਨਾ ਨਤੀਜੇ",
+    "monthlyPayment": "ਮਹੀਨਾਵਾਰ ਭੁਗਤਾਨ",
+    "totalPayment": "ਕੁੱਲ ਭੁਗਤਾਨ",
+    "totalInterest": "ਕੁੱਲ ਬਿਆਜ",
+    "amortizationSchedule": "ਪਰਿਸ਼ੋਧਨ ਅਨੁਸੂਚੀ"
+  },
+  
+  "buttons": {
+    "calculate": "ਗਣਨਾ ਕਰੋ",
+    "reset": "ਰੀਸੈੱਟ ਕਰੋ",
+    "download": "PDF ਡਾਊਨਲੋਡ ਕਰੋ",
+    "share": "ਸਾਂਝਾ ਕਰੋ"
+  }
+} 

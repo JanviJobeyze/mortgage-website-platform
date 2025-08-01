@@ -1,0 +1,169 @@
+{
+  "header": {
+    "skipToContent": "Skip to main content",
+    "brandName": "MortgageLink",
+    "home": "Home",
+    "about": "About",
+    "loanServices": "Loan Services",
+    "calculator": "Calculator",
+    "rates": "Rates",
+    "news": "News",
+    "faq": "FAQ",
+    "learningCentre": "Learning Centre",
+    "contact": "Contact",
+    "selectLanguage": "Select language",
+    "language": "Language",
+    "currentLanguage": "Current language",
+    "languageOptions": "Language options",
+    "mobileLanguageOptions": "Mobile language options",
+    "languageChanged": "Language changed to",
+    "toggleMobileMenu": "Toggle mobile menu",
+    "mobileNavigation": "Mobile navigation",
+    "mainNavigation": "Main navigation"
+  },
+  "home": {
+    "tagline": "Find Your Best Mortgage",
+    "cta": "Start Application",
+    "benefit1": "Low Rates",
+    "benefit2": "Fast Approval",
+    "benefit3": "Trusted Advisors",
+    "hero": {
+      "trustedBadge": "Trusted by 10,000+ Canadian Families",
+      "mainTitle": "Your Dream Home",
+      "mainTitleHighlight": "Starts Here",
+      "subtitle": "Get the best mortgage rates in Canada with our expert guidance. From first-time buyers to refinancing, we make homeownership accessible across all provinces.",
+      "currentBestRate": "Current Best Rate",
+      "fiveYearFixed": "5-Year Fixed",
+      "variableRate": "Variable Rate",
+      "primePlus": "Prime + 1.35%",
+      "getPreApproved": "Get Pre-Approved",
+      "calculatePayments": "Calculate Payments"
+    },
+    "calculator": {
+      "title": "Quick Payment Calculator",
+      "loanAmount": "Loan Amount",
+      "downPayment": "Down Payment",
+      "amortization": "Amortization",
+      "rate": "Rate",
+      "monthlyPayment": "Monthly Payment",
+      "viewDetailedCalculator": "View Detailed Calculator"
+    },
+    "ctaCard": {
+      "title": "How Much Can You Afford?",
+      "subtitle": "Try our free pre-qualification quiz in under 2 minutes.",
+      "button": "Get Started"
+    },
+    "solutions": {
+      "title": "Comprehensive Mortgage Solutions",
+      "subtitle": "Whether you're buying your first home, refinancing, or investing in your future, we have the expertise to guide you through every step of the process.",
+      "homePurchase": {
+        "title": "Home Purchase",
+        "description": "First-time buyer or moving up? We connect you with competitive pre-qualified through the purchase process.",
+        "learnMore": "Learn More"
+      },
+      "refinancing": {
+        "title": "Refinancing",
+        "description": "Lower your payments, consolidate debt or cash out refinancing. Help you maximize your home equity.",
+        "learnMore": "Learn More"
+      },
+      "homeEquity": {
+        "title": "Home Equity",
+        "description": "Unlock your home's value with a HELOC or second mortgage. Options. Renovations, investments, or major purchases.",
+        "learnMore": "Learn More"
+      }
+    },
+    "trusted": {
+      "title": "Trusted & Regulated",
+      "subtitle": "Licensed mortgage professionals with full regulatory compliance across Canada.",
+      "osfiApproved": "OSFI Approved",
+      "licensedInsured": "Licensed/Insured",
+      "asLenders": "As Lenders",
+      "rateComparison": "Rate Comparison"
+    },
+    "testimonials": {
+      "title": "What Our Clients Say",
+      "subtitle": "Trusted by families across Canada's major communities",
+      "previousTestimonial": "Previous testimonial",
+      "nextTestimonial": "Next testimonial",
+      "goToTestimonial": "Go to testimonial"
+    },
+    "provinces": {
+      "title": "Province-Specific Expertise",
+      "subtitle": "Local knowledge and regulatory expertise across Canada",
+      "ontario": {
+        "title": "Ontario",
+        "subtitle": "FSRA licensed, insured & bonded",
+        "features": [
+          "Land Transfer Tax credit (Toronto & Ontario)",
+          "First-Time Home Buyer Incentive guidance",
+          "RRSP HBP assistance/investment"
+        ],
+        "button": "Explore Ontario Services"
+      },
+      "britishColumbia": {
+        "title": "British Columbia",
+        "subtitle": "Vancouver, Victoria & Fraser Valley",
+        "features": [
+          "Foreign Buyer Tax compliance",
+          "BC Home Owner Mortgage programs",
+          "RRSP fees/bets of eligibility"
+        ],
+        "button": "Explore BC Services"
+      }
+    },
+    "newsletter": {
+      "title": "Stay Updated on Mortgage Rates",
+      "subtitle": "Get weekly rate updates, market insights, and exclusive mortgage tips delivered to your inbox.",
+      "placeholder": "Enter your email address",
+      "button": "Subscribe Now",
+      "privacy": "We respect your privacy. Unsubscribe at any time."
+    },
+    "rates": {
+      "title": "Current Best Mortgage Rates",
+      "subtitle": "Compare the most competitive mortgage rates from top Canadian lenders. Rates are updated daily and subject to change.",
+      "loading": "Loading current rates...",
+      "error": "Failed to load rates. Please try again later.",
+      "bestRate": "Best Rate",
+      "viewAllRates": "View All Rates",
+      "compareRates": "Compare rates from all provinces and lenders",
+      "rateChange": "from last week"
+    }
+  },
+  "footer": {
+    "brandName": "MortgageLink Canada",
+    "companyDescription": "Licensed mortgage brokerage serving Canadian families with expert guidance and trusted solutions. Get pre-approved, refinance, or find your dream home with us.",
+    "quickLinks": "Quick Links",
+    "contactInfo": "Contact Info",
+    "phone": "1-800-MORTGAGE",
+    "email": "info@mortgagelink.ca",
+    "address": {
+      "line1": "123 Bay Street, Suite 1000",
+      "line2": "Toronto, ON M5J 2J1"
+    },
+    "compliance": {
+      "nmlsId": "NMLS ID:",
+      "nmlsNumber": "#123456",
+      "licensedBy": "Licensed by the",
+      "financialConsumerAgency": "Financial Consumer Agency of Canada",
+      "mortgageBrokerage": "Mortgage brokerage license in all provinces. Licensed under the",
+      "mortgageBrokeragesAct": "Mortgage Brokerages, Lenders and Administrators Act",
+      "equalHousing": "Equal Housing Opportunity"
+    },
+    "importantNotice": {
+      "title": "Important Notice:",
+      "content": "This is not a commitment to lend. Rates, program terms and conditions are subject to change without notice. Not all applicants will qualify. Property and conditions apply. All loans subject to underwriting approval."
+    },
+    "equalHousing": {
+      "title": "Equal Housing Opportunity:",
+      "content": "We are committed to providing equal housing opportunities regardless of race, color, religion, sex, national origin, familial status, or disability. We comply with the Canadian Human Rights Act and provincial human rights legislation."
+    },
+    "privacy": {
+      "title": "Privacy:",
+      "content": "We are committed to protecting your privacy. View our",
+      "privacyPolicy": "Privacy Policy",
+      "forDetails": "for details on how we collect, use, and protect your information."
+    },
+    "copyright": "© 2024 MortgageLink Canada. All rights reserved. Licensed brokerage.",
+    "legalLinks": "Privacy Policy | Terms of Service | Licensing"
+  }
+} 

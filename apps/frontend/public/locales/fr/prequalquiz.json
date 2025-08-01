@@ -1,0 +1,94 @@
+{
+  "title": "Quiz de Préqualification",
+  "subtitle": "Découvrons combien vous pouvez vous permettre en moins de 2 minutes",
+  "stepIndicator": "Étape {current} sur {total}",
+  "progressComplete": "{percent}% Terminé",
+  
+  "welcome": {
+    "title": "Bienvenue ! Commençons",
+    "description": "Ce quiz rapide nous aidera à comprendre votre situation financière et à vous fournir une estimation précise de préqualification.",
+    "requirementsTitle": "Ce dont vous aurez besoin :",
+    "requirements": [
+      "Votre revenu annuel",
+      "Votre fourchette de cote de crédit",
+      "Votre mise de fonds",
+      "Vos paiements de dettes mensuels"
+    ],
+    "privacyNote": "Vos informations sont sécurisées et ne seront utilisées que pour cette estimation de préqualification."
+  },
+  
+  "personalInfo": {
+    "title": "Informations Personnelles",
+    "firstName": "Prénom",
+    "firstNamePlaceholder": "Entrez votre prénom",
+    "lastName": "Nom de Famille",
+    "lastNamePlaceholder": "Entrez votre nom de famille",
+    "email": "Adresse Courriel",
+    "emailPlaceholder": "Entrez votre adresse courriel"
+  },
+  
+  "financialInfo": {
+    "title": "Informations Financières",
+    "annualIncome": "Revenu Annuel",
+    "annualIncomePlaceholder": "Entrez votre revenu annuel",
+    "employmentStatus": "Statut d'Emploi",
+    "employmentOptions": {
+      "fullTime": "Employé à Temps Plein",
+      "partTime": "Employé à Temps Partiel",
+      "selfEmployed": "Travailleur Autonome",
+      "contractor": "Contracteur",
+      "retired": "Retraité"
+    },
+    "creditScore": "Fourchette de Cote de Crédit",
+    "creditScoreOptions": {
+      "excellent": "Excellente (750+)",
+      "good": "Bonne (700-749)",
+      "fair": "Passable (650-699)",
+      "poor": "Faible (600-649)",
+      "veryPoor": "Très Faible (<600)"
+    }
+  },
+  
+  "propertyInfo": {
+    "title": "Propriété et Mise de Fond",
+    "downPayment": "Montant de la Mise de Fond",
+    "downPaymentPlaceholder": "Entrez le montant de votre mise de fond",
+    "monthlyDebts": "Paiements de Dettes Mensuels",
+    "monthlyDebtsPlaceholder": "Entrez vos paiements de dettes mensuels totaux",
+    "debtNote": "Incluez les prêts auto, cartes de crédit, prêts étudiants, etc."
+  },
+  
+  "review": {
+    "title": "Vérifiez Vos Informations",
+    "description": "Veuillez vérifier vos informations avant que nous calculions votre préqualification.",
+    "yourInfo": "Vos Informations :",
+    "fields": {
+      "name": "Nom :",
+      "email": "Courriel :",
+      "annualIncome": "Revenu Annuel :",
+      "employment": "Emploi :",
+      "creditScore": "Cote de Crédit :",
+      "downPayment": "Mise de Fond :",
+      "monthlyDebts": "Dettes Mensuelles :"
+    },
+    "nextStepsTitle": "Ce qui va suivre :",
+    "nextSteps": [
+      "Recevez votre estimation de préqualification",
+      "Obtenez des recommandations hypothécaires personnalisées",
+      "Connectez-vous avec un spécialiste hypothécaire",
+      "Aucune obligation, aucune vérification de crédit requise"
+    ]
+  },
+  
+  "navigation": {
+    "back": "Retour",
+    "next": "Suivant",
+    "getResults": "Obtenir les Résultats"
+  },
+  
+  "validation": {
+    "required": "Ce champ est requis",
+    "invalidEmail": "Veuillez entrer une adresse courriel valide",
+    "invalidAmount": "Veuillez entrer un montant valide"
+  }
+} 
