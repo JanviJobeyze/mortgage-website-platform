@@ -85,7 +85,7 @@ function ArticleDetail() {
       content: `
         <p>When it comes to choosing a mortgage, one of the most important decisions you'll make is whether to go with a fixed or variable rate. This choice can significantly impact your monthly payments and overall mortgage costs.</p>
         
-        <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="House with mortgage rate comparison chart" title="Understanding mortgage rates is crucial for homebuyers">
+                        <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="House with mortgage rate comparison chart" title="Understanding mortgage rates is crucial for homebuyers" loading="lazy">
         
         <h2>What is a Fixed Rate Mortgage?</h2>
         <p>A fixed rate mortgage offers a consistent interest rate throughout the entire term of your loan. This means your monthly payment amount remains the same, providing predictability and peace of mind.</p>
@@ -112,7 +112,7 @@ function ArticleDetail() {
         <h2>What is a Variable Rate Mortgage?</h2>
         <p>A variable rate mortgage has an interest rate that can fluctuate based on changes to the Bank of Canada's prime rate. Your monthly payment may change as rates go up or down.</p>
         
-        <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Variable rate mortgage graph showing rate fluctuations over time" title="Variable rates can fluctuate with market conditions">
+        <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Variable rate mortgage graph showing rate fluctuations over time" title="Variable rates can fluctuate with market conditions" loading="lazy">
         
         <h3>Advantages of Variable Rates:</h3>
         <ul>
@@ -152,7 +152,7 @@ function ArticleDetail() {
         <h2>Current Market Considerations</h2>
         <p>In today's market, it's important to consider the current interest rate environment. With rates at historically low levels, many borrowers are choosing fixed rates to lock in these favorable terms.</p>
         
-        <img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Current mortgage market trends and rate analysis" title="Stay informed about current market conditions">
+        <img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Current mortgage market trends and rate analysis" title="Stay informed about current market conditions" loading="lazy">
         
         <p>However, if you believe rates may continue to decrease or you're comfortable with some uncertainty, a variable rate could still be an attractive option.</p>
         

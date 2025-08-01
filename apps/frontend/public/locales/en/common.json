@@ -117,6 +117,16 @@
       "placeholder": "Enter your email address",
       "button": "Subscribe Now",
       "privacy": "We respect your privacy. Unsubscribe at any time."
+    },
+    "rates": {
+      "title": "Current Best Mortgage Rates",
+      "subtitle": "Compare the most competitive mortgage rates from top Canadian lenders. Rates are updated daily and subject to change.",
+      "loading": "Loading current rates...",
+      "error": "Failed to load rates. Please try again later.",
+      "bestRate": "Best Rate",
+      "viewAllRates": "View All Rates",
+      "compareRates": "Compare rates from all provinces and lenders",
+      "rateChange": "from last week"
     }
   },
   "footer": {

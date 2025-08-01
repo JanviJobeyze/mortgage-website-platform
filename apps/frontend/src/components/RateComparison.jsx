@@ -1,6 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 
 /**
  * RateComparison Component
@@ -31,16 +30,43 @@ import { useTranslation } from 'react-i18next';
 const RateComparison = ({
   province = "Ontario",
   variant = "card",
-  ratesData = [],
   showProvinceFilter = true,
   title = "Mortgage Rate Comparison",
   subtitle,
   ctaText = "View All Rates",
   ctaLink = "/rates"
 }) => {
-  const { t } = useTranslation('common');
+
   const navigate = useNavigate();
   const [selectedProvince, setSelectedProvince] = useState(province);
+  const [rates, setRates] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch rates from API
+  useEffect(() => {
+    const fetchRates = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await fetch('http://localhost:5000/api/rates');
+        const data = await response.json();
+        
+        if (data.success) {
+          setRates(data.data || []);
+        } else {
+          setError(data.error || 'Failed to fetch rates');
+        }
+      } catch {
+        setError('Couldn\'t load rates, please try again');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRates();
+  }, []);
 
   // Available provinces for filtering
   const provinces = [
@@ -58,8 +84,8 @@ const RateComparison = ({
 
   // Filter rates by selected province and find best rate
   const filteredRates = useMemo(() => {
-    const filtered = ratesData.filter(rate => 
-      !selectedProvince || rate.province === selectedProvince
+    const filtered = rates.filter(rate => 
+      !selectedProvince || rate.provinces.includes(selectedProvince)
     );
     
     // Find the best rate (lowest rate)
@@ -68,7 +94,7 @@ const RateComparison = ({
       : null;
     
     return { rates: filtered, bestRate };
-  }, [ratesData, selectedProvince]);
+  }, [rates, selectedProvince]);
 
   const handleProvinceChange = (e) => {
     setSelectedProvince(e.target.value);
@@ -83,7 +109,7 @@ const RateComparison = ({
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {filteredRates.rates.map((rate, index) => (
         <div 
-          key={`${rate.lender}-${rate.term}-${index}`}
+          key={`${typeof rate.lender?.name === 'string' ? rate.lender.name : 'Unknown Lender'}-${rate.term}-${index}`}
           className={`bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 p-4 border-2 ${
             filteredRates.bestRate && rate.rate === filteredRates.bestRate.rate
               ? 'border-green-500 bg-green-50'
@@ -92,8 +118,8 @@ const RateComparison = ({
         >
           <div className="flex justify-between items-start mb-3">
             <div>
-              <h4 className="font-semibold text-gray-900 text-sm">{rate.lender}</h4>
-              <p className="text-gray-600 text-xs">{rate.productType}</p>
+              <h4 className="font-semibold text-gray-900 text-sm">{typeof rate.lender?.name === 'string' ? rate.lender.name : 'Unknown Lender'}</h4>
+              <p className="text-gray-600 text-xs">{rate.type} • {typeof rate.lender?.type === 'string' ? rate.lender.type : 'Major Bank'}</p>
             </div>
             {filteredRates.bestRate && rate.rate === filteredRates.bestRate.rate && (
               <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium">
@@ -119,10 +145,19 @@ const RateComparison = ({
               <span className="font-medium text-gray-900 text-sm">{rate.term}</span>
             </div>
             
-            {rate.payment && (
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600 text-sm">APR:</span>
+              <span className="font-medium text-gray-900 text-sm">{rate.apr}%</span>
+            </div>
+
+            {rate.change && (
               <div className="flex justify-between items-center">
-                <span className="text-gray-600 text-sm">Payment:</span>
-                <span className="font-medium text-gray-900 text-sm">{rate.payment}</span>
+                <span className="text-gray-600 text-sm">Change:</span>
+                <span className={`font-medium text-sm ${
+                  rate.change > 0 ? 'text-red-600' : rate.change < 0 ? 'text-green-600' : 'text-gray-600'
+                }`}>
+                  {rate.change > 0 ? '+' : ''}{rate.change}%
+                </span>
               </div>
             )}
           </div>
@@ -142,25 +177,26 @@ const RateComparison = ({
                 Lender
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Product Type
+                Type
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Rate
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                APR
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Term
               </th>
-              {filteredRates.rates.some(rate => rate.payment) && (
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Payment
-                </th>
-              )}
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Change
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {filteredRates.rates.map((rate, index) => (
               <tr 
-                key={`${rate.lender}-${rate.term}-${index}`}
+                key={`${typeof rate.lender?.name === 'string' ? rate.lender.name : 'Unknown Lender'}-${rate.term}-${index}`}
                 className={`hover:bg-gray-50 ${
                   filteredRates.bestRate && rate.rate === filteredRates.bestRate.rate
                     ? 'bg-green-50'
@@ -169,7 +205,7 @@ const RateComparison = ({
               >
                 <td className="px-4 py-3 whitespace-nowrap">
                   <div className="flex items-center">
-                    <span className="font-medium text-gray-900 text-sm">{rate.lender}</span>
+                                          <span className="font-medium text-gray-900 text-sm">{typeof rate.lender?.name === 'string' ? rate.lender.name : 'Unknown Lender'}</span>
                     {filteredRates.bestRate && rate.rate === filteredRates.bestRate.rate && (
                       <span className="ml-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
                         Best
@@ -178,7 +214,7 @@ const RateComparison = ({
                   </div>
                 </td>
                 <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                  {rate.productType}
+                                        {rate.type} • {typeof rate.lender?.type === 'string' ? rate.lender.type : 'Major Bank'}
                 </td>
                 <td className="px-4 py-3 whitespace-nowrap">
                   <span className={`font-bold text-lg ${
@@ -190,13 +226,18 @@ const RateComparison = ({
                   </span>
                 </td>
                 <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                  {rate.apr}%
+                </td>
+                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                   {rate.term}
                 </td>
-                {rate.payment && (
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                    {rate.payment}
-                  </td>
-                )}
+                <td className="px-4 py-3 whitespace-nowrap text-sm">
+                  <span className={`font-medium ${
+                    rate.change > 0 ? 'text-red-600' : rate.change < 0 ? 'text-green-600' : 'text-gray-600'
+                  }`}>
+                    {rate.change > 0 ? '+' : ''}{rate.change}%
+                  </span>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -234,16 +275,38 @@ const RateComparison = ({
         </div>
       )}
 
-      {/* Rates Display */}
-      <div className="mb-6">
-        {filteredRates.rates.length > 0 ? (
-          variant === 'table' ? <TableLayout /> : <CardLayout />
-        ) : (
-          <div className="text-center py-8">
-            <p className="text-gray-500 text-sm">No rates available for the selected criteria.</p>
+      {/* Loading State */}
+      {loading && (
+        <div className="text-center py-12">
+          <div className="inline-flex items-center">
+            <svg className="animate-spin -ml-1 mr-3 h-8 w-8 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span className="text-lg text-gray-600">Loading mortgage rates...</span>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && !loading && (
+        <div role="alert" className="bg-red-100 text-red-700 p-4 rounded-lg text-center">
+          {error}
+        </div>
+      )}
+
+      {/* Rates Display */}
+      {!loading && !error && (
+        <div className="mb-6">
+          {filteredRates.rates.length > 0 ? (
+            variant === 'table' ? <TableLayout /> : <CardLayout />
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-500 text-sm">No rates available for the selected criteria.</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* CTA Button */}
       <div className="text-center">

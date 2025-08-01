@@ -1,0 +1,15 @@
+# robots.txt for MortgageLink Canada
+# Allow search engines to crawl all pages
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://mortgagelink.ca/sitemap.xml
+
+# Crawl delay (optional - 1 second between requests)
+Crawl-delay: 1
+
+# Disallow admin or private areas (if any exist in future)
+# Disallow: /admin/
+# Disallow: /private/ 

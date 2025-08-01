@@ -5,177 +5,166 @@ import InfoTooltip from '../components/InfoTooltip';
 import VoiceReader from '../components/VoiceReader';
 import { getTermDefinition } from '../data/rateTerms';
 
-// Mock data for rates
-const mockRates = [
-  {
-    id: '1',
-    lender: {
-      name: 'RBC Royal Bank',
-      type: 'Major Bank',
-      logo: '🏦',
-      color: '#0052CC'
-    },
-    rate: 2.89,
-    apr: 3.12,
-    term: '5 Years',
-    type: 'Fixed',
-    purpose: 'Home Purchase',
-    provinces: ['Ontario', 'British Columbia', 'Alberta'],
-    change: '+0.05',
-    isTrending: 'up',
-    features: ['No prepayment penalty', 'Portable', 'Assumable'],
-    lastUpdated: '2024-01-15T10:30:00Z',
-    province: 'Ontario'
-  },
-  {
-    id: '2',
-    lender: {
-      name: 'TD Canada Trust',
-      type: 'Major Bank',
-      logo: '🏦',
-      color: '#00A3E0'
-    },
-    rate: 2.99,
-    apr: 3.22,
-    term: '5 Years',
-    type: 'Fixed',
-    purpose: 'Home Purchase',
-    provinces: ['Ontario', 'British Columbia', 'Alberta'],
-    change: '-0.02',
-    isTrending: 'down',
-    features: ['No prepayment penalty', 'Portable'],
-    lastUpdated: '2024-01-15T10:30:00Z',
-    province: 'Ontario'
-  },
-  {
-    id: '3',
-    lender: {
-      name: 'Scotiabank',
-      type: 'Major Bank',
-      logo: '🏦',
-      color: '#E31837'
-    },
-    rate: 2.95,
-    apr: 3.18,
-    term: '5 Years',
-    type: 'Variable',
-    purpose: 'Home Purchase',
-    provinces: ['Ontario', 'British Columbia', 'Alberta'],
-    change: '0.00',
-    isTrending: 'stable',
-    features: ['No prepayment penalty', 'Portable', 'Assumable'],
-    lastUpdated: '2024-01-15T10:30:00Z',
-    province: 'Ontario'
-  },
-  {
-    id: '4',
-    lender: {
-      name: 'CIBC',
-      type: 'Major Bank',
-      logo: '🏦',
-      color: '#FF6B35'
-    },
-    rate: 3.05,
-    apr: 3.28,
-    term: '5 Years',
-    type: 'Fixed',
-    purpose: 'Home Purchase',
-    provinces: ['Ontario', 'British Columbia', 'Alberta'],
-    change: '+0.03',
-    isTrending: 'up',
-    features: ['No prepayment penalty', 'Portable'],
-    lastUpdated: '2024-01-15T10:30:00Z',
-    province: 'Ontario'
-  },
-  {
-    id: '5',
-    lender: {
-      name: 'BMO',
-      type: 'Major Bank',
-      logo: '🏦',
-      color: '#0078D4'
-    },
-    rate: 2.92,
-    apr: 3.15,
-    term: '5 Years',
-    type: 'Variable',
-    purpose: 'Home Purchase',
-    provinces: ['Ontario', 'British Columbia', 'Alberta'],
-    change: '-0.01',
-    isTrending: 'down',
-    features: ['No prepayment penalty', 'Portable', 'Assumable'],
-    lastUpdated: '2024-01-15T10:30:00Z',
-    province: 'Ontario'
-  }
-];
-
 function Rates() {
-  useEffect(() => {
-    // Set page title
-    document.title = 'Compare Mortgage Rates | Best Canadian Mortgage Rates | MortgageLink Canada';
-    
-    // Set meta description
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) {
-      metaDescription.setAttribute('content', 'Compare the best mortgage rates from top Canadian lenders. Find competitive rates for home purchase, refinancing, and home equity loans. Get instant rate comparisons and quotes.');
-    } else {
-      const newMetaDescription = document.createElement('meta');
-      newMetaDescription.name = 'description';
-      newMetaDescription.content = 'Compare the best mortgage rates from top Canadian lenders. Find competitive rates for home purchase, refinancing, and home equity loans. Get instant rate comparisons and quotes.';
-      document.head.appendChild(newMetaDescription);
-    }
-
-    // Set meta keywords
-    const metaKeywords = document.querySelector('meta[name="keywords"]');
-    if (metaKeywords) {
-      metaKeywords.setAttribute('content', 'mortgage rates, rate comparison, Canadian mortgage rates, best mortgage rates, fixed rate, variable rate, mortgage quotes, rate calculator');
-    } else {
-      const newMetaKeywords = document.createElement('meta');
-      newMetaKeywords.name = 'keywords';
-      newMetaKeywords.content = 'mortgage rates, rate comparison, Canadian mortgage rates, best mortgage rates, fixed rate, variable rate, mortgage quotes, rate calculator';
-      document.head.appendChild(newMetaKeywords);
-    }
-
-    // Set Open Graph meta tags
-    const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) {
-      ogTitle.setAttribute('content', 'Compare Mortgage Rates | MortgageLink Canada');
-    } else {
-      const newOgTitle = document.createElement('meta');
-      newOgTitle.setAttribute('property', 'og:title');
-      newOgTitle.content = 'Compare Mortgage Rates | MortgageLink Canada';
-      document.head.appendChild(newOgTitle);
-    }
-
-    const ogDescription = document.querySelector('meta[property="og:description"]');
-    if (ogDescription) {
-      ogDescription.setAttribute('content', 'Compare the best mortgage rates from top Canadian lenders. Find competitive rates for home purchase, refinancing, and home equity loans.');
-    } else {
-      const newOgDescription = document.createElement('meta');
-      newOgDescription.setAttribute('property', 'og:description');
-      newOgDescription.content = 'Compare the best mortgage rates from top Canadian lenders. Find competitive rates for home purchase, refinancing, and home equity loans.';
-      document.head.appendChild(newOgDescription);
-    }
-
-    // Set canonical URL
-    const canonicalLink = document.querySelector('link[rel="canonical"]');
-    if (canonicalLink) {
-      canonicalLink.setAttribute('href', window.location.href);
-    } else {
-      const newCanonical = document.createElement('link');
-      newCanonical.rel = 'canonical';
-      newCanonical.href = window.location.href;
-      document.head.appendChild(newCanonical);
-    }
-  }, []);
-
   // ===== STATE =====
   const [province, setProvince] = useState('All Provinces');
   const [loanPurpose, setLoanPurpose] = useState('All Purposes');
   const [loanType, setLoanType] = useState('All Types');
   const [termLength, setTermLength] = useState('All Terms');
   const [lenderType, setLenderType] = useState('All Lenders');
-  const [filteredRates, setFilteredRates] = useState(mockRates);
+  const [rates, setRates] = useState([]);
+  const [filteredRates, setFilteredRates] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Dynamic SEO Metadata based on province selection
+  useEffect(() => {
+    // Get URL parameters for dynamic content
+    const urlParams = new URLSearchParams(window.location.search);
+    const provinceParam = urlParams.get('province');
+    const selectedProvince = provinceParam || province;
+    
+    // Dynamic title based on province
+    const provinceTitle = selectedProvince !== 'All Provinces' ? ` in ${selectedProvince}` : '';
+    const dynamicTitle = `Compare Mortgage Rates${provinceTitle} | Best Canadian Mortgage Rates | MortgageLink Canada`;
+    document.title = dynamicTitle;
+    
+    // Dynamic meta description
+    const provinceDescription = selectedProvince !== 'All Provinces' 
+      ? `Find the best mortgage rates in ${selectedProvince}. Compare competitive rates from top Canadian lenders for home purchase, refinancing, and home equity loans. Get instant rate comparisons and quotes.`
+      : 'Compare the best mortgage rates from top Canadian lenders. Find competitive rates for home purchase, refinancing, and home equity loans. Get instant rate comparisons and quotes.';
+    
+    let metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute('content', provinceDescription);
+    } else {
+      metaDescription = document.createElement('meta');
+      metaDescription.name = 'description';
+      metaDescription.content = provinceDescription;
+      document.head.appendChild(metaDescription);
+    }
+
+    // Dynamic keywords based on province
+    const provinceKeywords = selectedProvince !== 'All Provinces' 
+      ? `mortgage rates ${selectedProvince}, ${selectedProvince} mortgage rates, rate comparison, Canadian mortgage rates, best mortgage rates, fixed rate, variable rate, mortgage quotes, rate calculator`
+      : 'mortgage rates, rate comparison, Canadian mortgage rates, best mortgage rates, fixed rate, variable rate, mortgage quotes, rate calculator';
+    
+    let metaKeywords = document.querySelector('meta[name="keywords"]');
+    if (metaKeywords) {
+      metaKeywords.setAttribute('content', provinceKeywords);
+    } else {
+      metaKeywords = document.createElement('meta');
+      metaKeywords.name = 'keywords';
+      metaKeywords.content = provinceKeywords;
+      document.head.appendChild(metaKeywords);
+    }
+
+    // Add or update author
+    let metaAuthor = document.querySelector('meta[name="author"]');
+    if (metaAuthor) {
+      metaAuthor.setAttribute('content', 'MortgageLink Canada');
+    } else {
+      metaAuthor = document.createElement('meta');
+      metaAuthor.name = 'author';
+      metaAuthor.content = 'MortgageLink Canada';
+      document.head.appendChild(metaAuthor);
+    }
+
+    // Add or update robots
+    let metaRobots = document.querySelector('meta[name="robots"]');
+    if (metaRobots) {
+      metaRobots.setAttribute('content', 'index, follow');
+    } else {
+      metaRobots = document.createElement('meta');
+      metaRobots.name = 'robots';
+      metaRobots.content = 'index, follow';
+      document.head.appendChild(metaRobots);
+    }
+
+    // Dynamic Open Graph tags
+    const ogTags = [
+      { property: 'og:title', content: dynamicTitle },
+      { property: 'og:description', content: provinceDescription },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:url', content: `https://mortgagelink.ca/rates${provinceParam ? `?province=${provinceParam}` : ''}` },
+      { property: 'og:site_name', content: 'MortgageLink Canada' }
+    ];
+
+    ogTags.forEach(tag => {
+      let ogTag = document.querySelector(`meta[property="${tag.property}"]`);
+      if (ogTag) {
+        ogTag.setAttribute('content', tag.content);
+      } else {
+        ogTag = document.createElement('meta');
+        ogTag.setAttribute('property', tag.property);
+        ogTag.setAttribute('content', tag.content);
+        document.head.appendChild(ogTag);
+      }
+    });
+
+    // Dynamic Twitter Card tags
+    const twitterTags = [
+      { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:title', content: dynamicTitle },
+      { name: 'twitter:description', content: provinceDescription }
+    ];
+
+    twitterTags.forEach(tag => {
+      let twitterTag = document.querySelector(`meta[name="${tag.name}"]`);
+      if (twitterTag) {
+        twitterTag.setAttribute('content', tag.content);
+      } else {
+        twitterTag = document.createElement('meta');
+        twitterTag.setAttribute('name', tag.name);
+        twitterTag.setAttribute('content', tag.content);
+        document.head.appendChild(twitterTag);
+      }
+    });
+
+    // Set canonical URL with province parameter
+    const canonicalUrl = `https://mortgagelink.ca/rates${provinceParam ? `?province=${provinceParam}` : ''}`;
+    let canonicalLink = document.querySelector('link[rel="canonical"]');
+    if (canonicalLink) {
+      canonicalLink.setAttribute('href', canonicalUrl);
+    } else {
+      canonicalLink = document.createElement('link');
+      canonicalLink.rel = 'canonical';
+      canonicalLink.href = canonicalUrl;
+      document.head.appendChild(canonicalLink);
+    }
+
+    return () => {
+      document.title = 'MortgageLink Canada - Your Trusted Mortgage Partner';
+    };
+  }, [province]); // Re-run when province changes
+
+    // ===== API FETCH =====
+  
+  // Fetch rates from API
+  useEffect(() => {
+    const fetchRates = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await fetch('http://localhost:5000/api/rates');
+        const data = await response.json();
+        
+        if (data.success) {
+          setRates(data.data || []);
+          setFilteredRates(data.data || []);
+        } else {
+          setError(data.error || 'Failed to fetch rates');
+        }
+              } catch {
+          setError('Network error. Please check your connection and try again.');
+        } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRates();
+  }, []);
 
   // ===== HELPER FUNCTIONS =====
   
@@ -190,17 +179,24 @@ function Rates() {
   // Generate text for read-aloud functionality
   const generateReadAloudText = () => {
     const bestRate = getBestRate();
-    if (!bestRate) {
+    if (!bestRate || !bestRate.lender || !bestRate.lender.name || typeof bestRate.lender.name !== 'string') {
       return "No rates available to read aloud.";
     }
 
-    const rateText = `The best mortgage rate available is ${bestRate.rate}% from ${bestRate.lender.name}. `;
-    const detailsText = `This is a ${bestRate.type.toLowerCase()} rate with a ${bestRate.term.toLowerCase()} term. `;
-    const purposeText = `It's available for ${bestRate.purpose.toLowerCase()}. `;
-    const aprText = `The annual percentage rate is ${bestRate.apr}%. `;
-    const changeText = bestRate.change !== '0.00' ? 
-      `The rate has ${bestRate.change.startsWith('+') ? 'increased' : 'decreased'} by ${bestRate.change.replace('+', '').replace('-', '')} percentage points. ` : 
-      'The rate has remained stable. ';
+          const rateText = `The best mortgage rate available is ${bestRate.rate}% from ${typeof bestRate.lender?.name === 'string' ? bestRate.lender.name : 'Unknown Lender'}. `;
+    const detailsText = `This is a ${bestRate.type ? bestRate.type.toLowerCase() : 'mortgage'} rate with a ${bestRate.term ? bestRate.term.toLowerCase() : 'standard'} term. `;
+    const purposeText = bestRate.purpose ? `It's available for ${bestRate.purpose.toLowerCase()}. ` : '';
+    const aprText = bestRate.apr ? `The annual percentage rate is ${bestRate.apr}%. ` : '';
+    
+    let changeText = 'The rate has remained stable. ';
+    if (bestRate.change !== undefined && bestRate.change !== null) {
+      const changeValue = bestRate.change;
+      if (changeValue > 0) {
+        changeText = `The rate has increased by ${changeValue} percentage points. `;
+      } else if (changeValue < 0) {
+        changeText = `The rate has decreased by ${Math.abs(changeValue)} percentage points. `;
+      }
+    }
 
     return rateText + detailsText + purposeText + aprText + changeText;
   };
@@ -236,7 +232,7 @@ function Rates() {
 
   // Client-side filtering logic
   useEffect(() => {
-    let filtered = [...mockRates];
+    let filtered = [...rates];
 
     // Apply filters
     if (province !== 'All Provinces') {
@@ -244,7 +240,7 @@ function Rates() {
     }
 
     if (loanPurpose !== 'All Purposes') {
-      filtered = filtered.filter(rate => rate.purpose === loanPurpose);
+      filtered = filtered.filter(rate => rate.purpose && rate.purpose === loanPurpose);
     }
 
     if (loanType !== 'All Types') {
@@ -261,12 +257,13 @@ function Rates() {
     }
 
     setFilteredRates(filtered);
-  }, [province, loanPurpose, loanType, termLength, lenderType]);
+  }, [rates, province, loanPurpose, loanType, termLength, lenderType]);
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Page Header */}
-      <section className="bg-[#C8E6C9] py-8 sm:py-12 md:py-16 lg:py-20">
+      <main id="main">
+        {/* Page Header */}
+        <section className="bg-[#C8E6C9] py-8 sm:py-12 md:py-16 lg:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#212121] mb-4 sm:mb-6">
@@ -535,8 +532,44 @@ function Rates() {
 
             {/* Right Column - Current Rates */}
             <div className="lg:col-span-3">
+              {/* Loading State */}
+              {loading && (
+                <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                  <div className="text-center">
+                    <div className="inline-flex items-center">
+                      <svg className="animate-spin -ml-1 mr-3 h-8 w-8 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span className="text-lg text-gray-600">Loading mortgage rates...</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Error State */}
+              {error && !loading && (
+                <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                  <div className="text-center">
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
+                      <svg className="w-12 h-12 text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                      </svg>
+                      <h3 className="text-lg font-medium text-red-800 mb-2">Unable to load rates</h3>
+                      <p className="text-red-600 text-sm mb-4">{error}</p>
+                      <button 
+                        onClick={() => window.location.reload()} 
+                        className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors duration-200 text-sm"
+                      >
+                        Try Again
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Best Rate Summary with Read-Aloud */}
-              {filteredRates && filteredRates.length > 0 && (
+              {!loading && !error && filteredRates && filteredRates.length > 0 && (
                 <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-6" role="region" aria-labelledby="best-rate-heading">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
@@ -552,11 +585,11 @@ function Rates() {
                             <p className="text-2xl sm:text-3xl font-bold text-[#1B5E20]" id="best-rate-details" aria-label={`Best rate: ${bestRate.rate} percent`}>
                               {bestRate.rate}%
                             </p>
-                            <p className="text-sm sm:text-base text-gray-600" aria-label={`Lender: ${bestRate.lender.name}, Type: ${bestRate.type}, Term: ${bestRate.term}`}>
-                              {bestRate.lender.name} • {bestRate.type} • {bestRate.term}
+                                            <p className="text-sm sm:text-base text-gray-600" aria-label={`Lender: ${typeof bestRate.lender?.name === 'string' ? bestRate.lender.name : 'Unknown Lender'}, Type: ${bestRate.type}, Term: ${bestRate.term}`}>
+                  {typeof bestRate.lender?.name === 'string' ? bestRate.lender.name : 'Unknown Lender'} • {bestRate.type} • {bestRate.term}
                             </p>
-                            <p className="text-xs sm:text-sm text-gray-500" aria-label={`Annual Percentage Rate: ${bestRate.apr} percent, Purpose: ${bestRate.purpose}`}>
-                              APR: {bestRate.apr}% • {bestRate.purpose}
+                            <p className="text-xs sm:text-sm text-gray-500" aria-label={`Annual Percentage Rate: ${bestRate.apr} percent${bestRate.purpose ? `, Purpose: ${bestRate.purpose}` : ''}`}>
+                              APR: {bestRate.apr}%{bestRate.purpose ? ` • ${bestRate.purpose}` : ''}
                             </p>
                           </div>
                         );
@@ -579,12 +612,12 @@ function Rates() {
               )}
 
               {/* Rates Table */}
-              {filteredRates && filteredRates.length > 0 && (
+              {!loading && !error && filteredRates && filteredRates.length > 0 && (
                 <RatesTable data={filteredRates} />
               )}
 
               {/* No Results */}
-              {filteredRates && filteredRates.length === 0 && (
+              {!loading && !error && filteredRates && filteredRates.length === 0 && (
                 <div className="bg-white rounded-lg shadow-md p-6 mb-6">
                   <div className="text-center">
                     <svg className="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -656,6 +689,7 @@ function Rates() {
           </div>
         </div>
       </section>
+      </main>
     </div>
   );
 }

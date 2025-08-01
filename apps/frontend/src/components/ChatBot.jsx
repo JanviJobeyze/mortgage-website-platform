@@ -140,7 +140,7 @@ function ChatBot() {
             </svg>
           ) : (
             // Chat bot icon when closed
-            <img src={VoiceBotIcon} alt="Voice Bot" className="w-6 h-6 sm:w-8 sm:h-8" />
+                            <img src={VoiceBotIcon} alt="Voice Bot" className="w-6 h-6 sm:w-8 sm:h-8" loading="lazy" />
           )}
         </div>
 
@@ -157,7 +157,7 @@ function ChatBot() {
           {/* Chat Header */}
           <div className="flex items-center p-4 border-b border-gray-200">
             <div className="w-10 h-10 flex items-center justify-center mr-3">
-              <img src={ChatBotIcon} alt="Voice Bot" className="w-10 h-10 rounded-full object-cover" />
+                              <img src={ChatBotIcon} alt="Voice Bot" className="w-10 h-10 rounded-full object-cover" loading="lazy" />
             </div>
             <div>
               <h4 className="font-semibold text-[#212121]">Mortgage Assistant</h4>

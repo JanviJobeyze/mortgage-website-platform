@@ -4,6 +4,16 @@
   padding: 0;
 }
 
+/* Smooth scrolling behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Ensure proper scroll behavior on all browsers */
+body {
+  scroll-behavior: smooth;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;

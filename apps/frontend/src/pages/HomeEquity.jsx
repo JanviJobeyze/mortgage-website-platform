@@ -33,7 +33,7 @@ function HomeEquity() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             <div>
               <div className="flex items-center mb-6">
-                <img src={equityServiceIcon} alt="Home Equity" className="w-16 h-16 mr-4" />
+                <img src={equityServiceIcon} alt="Home Equity" className="w-16 h-16 mr-4" loading="lazy" />
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900">
                   Home Equity Solutions
                 </h1>
@@ -54,6 +54,24 @@ function HomeEquity() {
                   className="bg-white text-[#1B5E20] px-8 py-4 rounded-lg font-semibold border-2 border-[#1B5E20] hover:bg-[#1B5E20] hover:text-white transition-colors duration-200"
                 >
                   Speak with Expert
+                </button>
+                <button 
+                  onClick={() => navigate('/apply')}
+                  onMouseEnter={() => {
+                    const link = document.createElement('link');
+                    link.rel = 'prefetch';
+                    link.href = '/apply';
+                    link.as = 'document';
+                    document.head.appendChild(link);
+                    setTimeout(() => {
+                      if (document.head.contains(link)) {
+                        document.head.removeChild(link);
+                      }
+                    }, 1000);
+                  }}
+                  className="bg-[#4CAF50] text-white px-8 py-4 rounded-lg font-semibold hover:bg-[#45a049] transition-colors duration-200"
+                >
+                  Apply Now
                 </button>
               </div>
             </div>
@@ -310,7 +328,7 @@ function HomeEquity() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
               <div className="flex items-center mb-4">
-                <img src={documentIcon} alt="Income Documents" className="w-12 h-12 mr-4" />
+                <img src={documentIcon} alt="Income Documents" className="w-12 h-12 mr-4" loading="lazy" />
                 <h3 className="text-xl font-bold text-gray-900">Income Documents</h3>
               </div>
               <ul className="space-y-3 text-gray-600">
@@ -343,7 +361,7 @@ function HomeEquity() {
             
             <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
               <div className="flex items-center mb-4">
-                <img src={financialRecordsIcon} alt="Financial Records" className="w-12 h-12 mr-4" />
+                <img src={financialRecordsIcon} alt="Financial Records" className="w-12 h-12 mr-4" loading="lazy" />
                 <h3 className="text-xl font-bold text-gray-900">Financial Records</h3>
               </div>
               <ul className="space-y-3 text-gray-600">
@@ -376,7 +394,7 @@ function HomeEquity() {
             
             <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
               <div className="flex items-center mb-4">
-                <img src={propertyDocumentsIcon} alt="Property Documents" className="w-12 h-12 mr-4" />
+                <img src={propertyDocumentsIcon} alt="Property Documents" className="w-12 h-12 mr-4" loading="lazy" />
                 <h3 className="text-xl font-bold text-gray-900">Property Documents</h3>
               </div>
               <ul className="space-y-3 text-gray-600">
@@ -423,6 +441,24 @@ function HomeEquity() {
               className="bg-white text-[#1B5E20] px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200"
             >
               Calculate Equity Now
+            </button>
+            <button 
+              onClick={() => navigate('/apply')}
+              onMouseEnter={() => {
+                const link = document.createElement('link');
+                link.rel = 'prefetch';
+                link.href = '/apply';
+                link.as = 'document';
+                document.head.appendChild(link);
+                setTimeout(() => {
+                  if (document.head.contains(link)) {
+                    document.head.removeChild(link);
+                  }
+                }, 1000);
+              }}
+              className="bg-[#4CAF50] text-white px-8 py-4 rounded-lg font-semibold hover:bg-[#45a049] transition-colors duration-200"
+            >
+              Apply Now
             </button>
             <button 
               onClick={() => navigate('/contact')}

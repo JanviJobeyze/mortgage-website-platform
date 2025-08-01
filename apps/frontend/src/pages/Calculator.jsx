@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { generateDownPaymentOptions, formatCurrency } from '../utils/mortgageCalculations.js';
-import MortgagePaymentChart from '../components/charts/MortgagePaymentChart.jsx';
-import AffordabilityChart from '../components/charts/AffordabilityChart.jsx';
-import LandTransferTaxChart from '../components/charts/LandTransferTaxChart.jsx';
-import DownPaymentChart from '../components/charts/DownPaymentChart.jsx';
-import AmortizationChart from '../components/charts/AmortizationChart.jsx';
+import { 
+  LazyMortgagePaymentChart as MortgagePaymentChart,
+  LazyAffordabilityChart as AffordabilityChart,
+  LazyLandTransferTaxChart as LandTransferTaxChart,
+  LazyDownPaymentChart as DownPaymentChart,
+  LazyAmortizationChart as AmortizationChart
+} from '../components/charts/LazyChartWrapper.jsx';
+import { trackCalculatorUsage, trackUserEngagement } from '../utils/analytics';
 import tooltipIcon from '../assets/ToolTip.png';
 
 // Credit score ranges for affordability calculator
@@ -841,6 +844,13 @@ function Calculator() {
         break;
     }
 
+    // Track calculator interaction
+    trackUserEngagement('calculator_field_changed', {
+      field_name: field,
+      field_value: parsedValue,
+      calculator_type: 'mortgage_payment'
+    });
+
 
 
     // Only update form data if validation passes or field is not numeric
@@ -1552,7 +1562,7 @@ function Calculator() {
                     <label className="block text-sm font-medium text-[#1B5E20] mb-2">
                       Start here
                       <Tooltip content="Enter the purchase price of the home you're interested in. This is the total amount you'll pay for the property.">
-                        <img src={tooltipIcon} alt="Info" className="ml-1 w-4 h-4 cursor-help hover:opacity-80 transition-opacity" />
+                        <img src={tooltipIcon} alt="Info" className="ml-1 w-4 h-4 cursor-help hover:opacity-80 transition-opacity" loading="lazy" />
                       </Tooltip>
                     </label>
                     <div className="relative">
@@ -1581,7 +1591,7 @@ function Calculator() {
                     <label className="block text-sm font-medium text-[#1B5E20] mb-2">
                       Interest Rate
                       <Tooltip content="The annual interest rate on your mortgage loan. This determines how much interest you'll pay over the life of your loan.">
-                        <img src={tooltipIcon} alt="Info" className="ml-1 w-4 h-4 cursor-help hover:opacity-80 transition-opacity" />
+                        <img src={tooltipIcon} alt="Info" className="ml-1 w-4 h-4 cursor-help hover:opacity-80 transition-opacity" loading="lazy" />
                       </Tooltip>
                     </label>
                     <div className="relative">
@@ -1603,7 +1613,7 @@ function Calculator() {
                     <label className="block text-sm font-medium text-[#1B5E20] mb-2">
                       Amortization Period
                       <Tooltip content="The total time it will take to pay off your mortgage completely. Longer periods mean lower monthly payments but more total interest paid.">
-                        <img src={tooltipIcon} alt="Info" className="ml-1 w-4 h-4 cursor-help hover:opacity-80 transition-opacity" />
+                        <img src={tooltipIcon} alt="Info" className="ml-1 w-4 h-4 cursor-help hover:opacity-80 transition-opacity" loading="lazy" />
                       </Tooltip>
                     </label>
                     <select
@@ -1622,7 +1632,7 @@ function Calculator() {
                     <label className="block text-sm font-medium text-[#1B5E20] mb-2">
                       Payment Frequency
                       <Tooltip content="How often you make mortgage payments. More frequent payments can help you pay off your mortgage faster and save on interest.">
-                        <img src={tooltipIcon} alt="Info" className="ml-1 w-4 h-4 cursor-help hover:opacity-80 transition-opacity" />
+                        <img src={tooltipIcon} alt="Info" className="ml-1 w-4 h-4 cursor-help hover:opacity-80 transition-opacity" loading="lazy" />
                       </Tooltip>
                     </label>
                     <select
@@ -1643,7 +1653,7 @@ function Calculator() {
                     <label className="block text-sm font-medium text-[#1B5E20] mb-2">
                       Province
                       <Tooltip content="Select your province to calculate accurate land transfer taxes and other location-specific costs.">
-                        <img src={tooltipIcon} alt="Info" className="ml-1 w-4 h-4 cursor-help hover:opacity-80 transition-opacity" />
+                        <img src={tooltipIcon} alt="Info" className="ml-1 w-4 h-4 cursor-help hover:opacity-80 transition-opacity" loading="lazy" />
                       </Tooltip>
                     </label>
                     <select
@@ -1731,7 +1741,7 @@ function Calculator() {
                       <span className="hidden sm:inline">Down payment</span>
                       <span className="sm:hidden">Down</span>
                       <Tooltip content="The amount of money you pay upfront when buying a home. A larger down payment means a smaller mortgage and lower monthly payments.">
-                        <img src={tooltipIcon} alt="Info" className="ml-1 sm:ml-2 w-3 h-3 sm:w-4 sm:h-4 cursor-help hover:opacity-80 transition-opacity" />
+                        <img src={tooltipIcon} alt="Info" className="ml-1 sm:ml-2 w-3 h-3 sm:w-4 sm:h-4 cursor-help hover:opacity-80 transition-opacity" loading="lazy" />
                       </Tooltip>
                     </div>
                     {[5, 10, 15, 20].map((percent) => (
@@ -1755,7 +1765,7 @@ function Calculator() {
                       <span className="hidden sm:inline">CMHC insurance</span>
                       <span className="sm:hidden">CMHC</span>
                       <Tooltip content="Mortgage default insurance required when your down payment is less than 20%. This protects the lender and is added to your mortgage amount.">
-                        <img src={tooltipIcon} alt="Info" className="ml-1 sm:ml-2 w-3 h-3 sm:w-4 sm:h-4 cursor-help hover:opacity-80 transition-opacity" />
+                        <img src={tooltipIcon} alt="Info" className="ml-1 sm:ml-2 w-3 h-3 sm:w-4 sm:h-4 cursor-help hover:opacity-80 transition-opacity" loading="lazy" />
                       </Tooltip>
                     </div>
                     {[5, 10, 15, 20].map((percent) => {
@@ -1785,7 +1795,7 @@ function Calculator() {
                       <span className="hidden sm:inline">Total mortgage</span>
                       <span className="sm:hidden">Total</span>
                       <Tooltip content="The total amount you're borrowing, including the loan amount plus any CMHC insurance. This is what you'll pay interest on.">
-                        <img src={tooltipIcon} alt="Info" className="ml-1 sm:ml-2 w-3 h-3 sm:w-4 sm:h-4 cursor-help hover:opacity-80 transition-opacity" />
+                        <img src={tooltipIcon} alt="Info" className="ml-1 sm:ml-2 w-3 h-3 sm:w-4 sm:h-4 cursor-help hover:opacity-80 transition-opacity" loading="lazy" />
                       </Tooltip>
                     </div>
                     {[5, 10, 15, 20].map((percent) => {
@@ -1815,7 +1825,7 @@ function Calculator() {
                       <span className="hidden sm:inline">Amortization</span>
                       <span className="sm:hidden">Amort</span>
                       <Tooltip content="The total time to pay off your mortgage. Longer amortization means lower monthly payments but more total interest paid over time.">
-                        <img src={tooltipIcon} alt="Info" className="ml-1 sm:ml-2 w-3 h-3 sm:w-4 sm:h-4 cursor-help hover:opacity-80 transition-opacity" />
+                        <img src={tooltipIcon} alt="Info" className="ml-1 sm:ml-2 w-3 h-3 sm:w-4 sm:h-4 cursor-help hover:opacity-80 transition-opacity" loading="lazy" />
                       </Tooltip>
                     </div>
                     {[5, 10, 15, 20].map((percent) => (
@@ -1879,7 +1889,7 @@ function Calculator() {
                       <span className="hidden sm:inline">Payment frequency</span>
                       <span className="sm:hidden">Frequency</span>
                       <Tooltip content="How often you make mortgage payments. More frequent payments can help you pay off your mortgage faster and save on interest.">
-                        <img src={tooltipIcon} alt="Info" className="ml-1 sm:ml-2 w-3 h-3 sm:w-4 sm:h-4 cursor-help hover:opacity-80 transition-opacity" />
+                        <img src={tooltipIcon} alt="Info" className="ml-1 sm:ml-2 w-3 h-3 sm:w-4 sm:h-4 cursor-help hover:opacity-80 transition-opacity" loading="lazy" />
                       </Tooltip>
                     </div>
                     {[5, 10, 15, 20].map((percent) => (
@@ -1904,7 +1914,7 @@ function Calculator() {
                       <span className="hidden sm:inline">Mortgage payment</span>
                       <span className="sm:hidden">Payment</span>
                       <Tooltip content="Your regular payment amount based on the mortgage amount, interest rate, and payment frequency. This is what you'll pay each period.">
-                        <img src={tooltipIcon} alt="Info" className="ml-1 sm:ml-2 w-3 h-3 sm:w-4 sm:h-4 cursor-help hover:opacity-80 transition-opacity" />
+                        <img src={tooltipIcon} alt="Info" className="ml-1 sm:ml-2 w-3 h-3 sm:w-4 sm:h-4 cursor-help hover:opacity-80 transition-opacity" loading="lazy" />
                       </Tooltip>
                     </div>
                     {[5, 10, 15, 20].map((percent) => {

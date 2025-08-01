@@ -2,6 +2,24 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import HomeLogo from '../assets/HomeLogo.png';
+import { preloadRates, preloadQuiz, preloadOnHover, preloadOnFocus } from '../utils/preloadUtils';
+
+// Prefetch utility function
+const prefetchRoute = (path) => {
+  // Prefetch the route by creating a link element
+  const link = document.createElement('link');
+  link.rel = 'prefetch';
+  link.href = path;
+  link.as = 'document';
+  document.head.appendChild(link);
+  
+  // Clean up after a short delay
+  setTimeout(() => {
+    if (document.head.contains(link)) {
+      document.head.removeChild(link);
+    }
+  }, 1000);
+};
 
 function Navigation() {
   const { t, i18n } = useTranslation('common');
@@ -140,6 +158,7 @@ function Navigation() {
                   src={HomeLogo} 
                   alt="MortgageLink" 
                   className="h-8 w-auto"
+                  loading="lazy"
                 />
                 <span className="ml-2 text-xl font-semibold text-gray-900">{t('header.brandName')}</span>
               </Link>
@@ -162,18 +181,32 @@ function Navigation() {
               <Link 
                 to="/services" 
                 className="text-gray-700 hover:text-green-600 px-2 py-2 text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:rounded"
+                onMouseEnter={() => {
+                  prefetchRoute('/services');
+                  preloadQuiz();
+                  prefetchRoute('/apply');
+                }}
+                onFocus={() => {
+                  prefetchRoute('/services');
+                  preloadQuiz();
+                  prefetchRoute('/apply');
+                }}
               >
                 {t('header.loanServices')}
               </Link>
               <Link 
                 to="/calculator" 
                 className="text-gray-700 hover:text-green-600 px-2 py-2 text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:rounded"
+                onMouseEnter={() => prefetchRoute('/calculator')}
+                onFocus={() => prefetchRoute('/calculator')}
               >
                 {t('header.calculator')}
               </Link>
               <Link 
                 to="/rates" 
                 className="text-gray-700 hover:text-green-600 px-2 py-2 text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:rounded"
+                {...preloadOnHover(preloadRates)}
+                {...preloadOnFocus(preloadRates)}
               >
                 {t('header.rates')}
               </Link>
@@ -309,6 +342,16 @@ function Navigation() {
                   to="/services" 
                   className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-white rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                   onClick={() => setIsMobileMenuOpen(false)}
+                  onMouseEnter={() => {
+                    prefetchRoute('/services');
+                    prefetchRoute('/pre-qualify');
+                    prefetchRoute('/apply');
+                  }}
+                  onFocus={() => {
+                    prefetchRoute('/services');
+                    prefetchRoute('/pre-qualify');
+                    prefetchRoute('/apply');
+                  }}
                 >
                   {t('header.loanServices')}
                 </Link>
@@ -316,6 +359,8 @@ function Navigation() {
                   to="/calculator" 
                   className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-white rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                   onClick={() => setIsMobileMenuOpen(false)}
+                  onMouseEnter={() => prefetchRoute('/calculator')}
+                  onFocus={() => prefetchRoute('/calculator')}
                 >
                   {t('header.calculator')}
                 </Link>
@@ -323,6 +368,8 @@ function Navigation() {
                   to="/rates" 
                   className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-white rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                   onClick={() => setIsMobileMenuOpen(false)}
+                  onMouseEnter={() => prefetchRoute('/rates')}
+                  onFocus={() => prefetchRoute('/rates')}
                 >
                   {t('header.rates')}
                 </Link>

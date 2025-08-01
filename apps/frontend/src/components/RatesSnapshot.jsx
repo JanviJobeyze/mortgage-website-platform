@@ -58,9 +58,9 @@ const RatesSnapshot = ({
   variant = "default",
   loading = false,
   fallbackRates = [
-    { lender: 'RBC Royal Bank', rate: 2.89, type: 'Fixed', term: '5 Years' },
-    { lender: 'TD Canada Trust', rate: 2.99, type: 'Fixed', term: '5 Years' },
-    { lender: 'Scotiabank', rate: 2.95, type: 'Variable', term: '5 Years' }
+    { lender: { name: 'RBC Royal Bank', type: 'Major Bank', logo: 'RBC', color: 'bg-blue-600' }, rate: 2.89, type: 'Fixed', term: '5 Years' },
+    { lender: { name: 'TD Canada Trust', type: 'Major Bank', logo: 'TD', color: 'bg-green-600' }, rate: 2.99, type: 'Fixed', term: '5 Years' },
+    { lender: { name: 'Scotiabank', type: 'Major Bank', logo: 'SC', color: 'bg-blue-800' }, rate: 2.95, type: 'Variable', term: '5 Years' }
   ]
 }) => {
   const navigate = useNavigate();
@@ -210,7 +210,7 @@ const RatesSnapshot = ({
                <div key={index} className={styles.card}>
                  {/* Lender Name */}
                  <div className={styles.lender}>
-                   {rate.lender}
+                   {typeof rate.lender === 'object' ? rate.lender.name : rate.lender}
                  </div>
                  
                  {/* Rate Display with Professional Styling */}

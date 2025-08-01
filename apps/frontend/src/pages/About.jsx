@@ -283,7 +283,7 @@ function About() {
       <section className="bg-[#C8E6C9] py-8 sm:py-12 md:py-16 px-4 animate-fade-in">
         <div className="max-w-7xl mx-auto text-center">
           <div className="bg-[#FFE0B2] text-[#E65100] px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium inline-flex items-center w-fit mb-6 animate-fade-in animation-delay-200">
-            <img src={StarIcon} alt="Star" className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                            <img src={StarIcon} alt="Star" className="w-3 h-3 sm:w-4 sm:h-4 mr-2" loading="lazy" />
             <span className="whitespace-nowrap">Licensed & Regulated Mortgage Professionals</span>
           </div>
           
@@ -360,28 +360,28 @@ function About() {
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-start">
-                    <img src={CorrectIcon} alt="Checkmark" className="w-4 h-4 mr-3 mt-1 flex-shrink-0" />
+                    <img src={CorrectIcon} alt="Checkmark" className="w-4 h-4 mr-3 mt-1 flex-shrink-0" loading="lazy" />
                     <div>
                       <h4 className="font-semibold text-[#212121] mb-1 text-sm">Integrity</h4>
                       <p className="text-[#757575] text-xs">Honest, transparent advice in every interaction</p>
                     </div>
                   </div>
                   <div className="flex items-start">
-                    <img src={CorrectIcon} alt="Checkmark" className="w-4 h-4 mr-3 mt-1 flex-shrink-0" />
+                    <img src={CorrectIcon} alt="Checkmark" className="w-4 h-4 mr-3 mt-1 flex-shrink-0" loading="lazy" />
                     <div>
                       <h4 className="font-semibold text-[#212121] mb-1 text-sm">Excellence</h4>
                       <p className="text-[#757575] text-xs">Continuous improvement and professional growth</p>
                     </div>
                   </div>
                   <div className="flex items-start">
-                    <img src={CorrectIcon} alt="Checkmark" className="w-4 h-4 mr-3 mt-1 flex-shrink-0" />
+                    <img src={CorrectIcon} alt="Checkmark" className="w-4 h-4 mr-3 mt-1 flex-shrink-0" loading="lazy" />
                     <div>
                       <h4 className="font-semibold text-[#212121] mb-1 text-sm">Client-First</h4>
                       <p className="text-[#757575] text-xs">Your success is our primary focus</p>
                     </div>
                   </div>
                   <div className="flex items-start">
-                    <img src={CorrectIcon} alt="Checkmark" className="w-4 h-4 mr-3 mt-1 flex-shrink-0" />
+                    <img src={CorrectIcon} alt="Checkmark" className="w-4 h-4 mr-3 mt-1 flex-shrink-0" loading="lazy" />
                     <div>
                       <h4 className="font-semibold text-[#212121] mb-1 text-sm">Innovation</h4>
                       <p className="text-[#757575] text-xs">Embracing technology for better service</p>
@@ -423,6 +423,7 @@ function About() {
                           src={member.photo} 
                           alt={member.name} 
                           className="w-full h-full object-cover"
+                          loading="lazy"
                         />
                       </div>
                       {/* Active Status Indicator */}

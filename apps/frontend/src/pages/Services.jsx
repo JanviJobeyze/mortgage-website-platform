@@ -328,7 +328,7 @@ function Services() {
             <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 lg:p-8 border border-gray-200 flex flex-col h-full">
               <div className="flex items-start mb-4 sm:mb-6">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 flex items-center justify-center mr-3 flex-shrink-0">
-                  <img src={homeServiceIcon} alt="Home Purchase" className="w-full h-full" />
+                  <img src={homeServiceIcon} alt="Home Purchase" className="w-full h-full" loading="lazy" />
                 </div>
                 <div className="flex-grow">
                   <h3 className="text-base sm:text-lg lg:text-xl font-bold leading-tight mb-1" style={{color: '#212121'}}>Home Purchase Loans</h3>
@@ -409,7 +409,7 @@ function Services() {
             <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 lg:p-8 border border-gray-200 flex flex-col h-full">
               <div className="flex items-start mb-4 sm:mb-6">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 flex items-center justify-center mr-3 flex-shrink-0">
-                  <img src={refiniServiceIcon} alt="Refinancing Options" className="w-full h-full" />
+                  <img src={refiniServiceIcon} alt="Refinancing Options" className="w-full h-full" loading="lazy" />
                 </div>
                 <div className="flex-grow">
                   <h3 className="text-base sm:text-lg lg:text-xl font-bold leading-tight mb-1" style={{color: '#212121'}}>Refinancing Options</h3>
@@ -490,7 +490,7 @@ function Services() {
             <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 lg:p-8 border border-gray-200 flex flex-col h-full md:col-span-2 xl:col-span-1">
               <div className="flex items-start mb-4 sm:mb-6">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 flex items-center justify-center mr-3 flex-shrink-0">
-                  <img src={equityServiceIcon} alt="Home Equity Solutions" className="w-full h-full" />
+                  <img src={equityServiceIcon} alt="Home Equity Solutions" className="w-full h-full" loading="lazy" />
                 </div>
                 <div className="flex-grow">
                   <h3 className="text-base sm:text-lg lg:text-xl font-bold leading-tight mb-1" style={{color: '#212121'}}>Home Equity Solutions</h3>
@@ -972,7 +972,7 @@ function Services() {
             <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 lg:p-8 shadow-lg">
               <div className="flex items-center mb-4 sm:mb-6 lg:mb-8">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 flex items-center justify-center mr-3 sm:mr-4">
-                  <img src={documentIcon} alt="Income Documents" className="w-full h-full" />
+                  <img src={documentIcon} alt="Income Documents" className="w-full h-full" loading="lazy" />
                 </div>
                 <h3 className="text-lg sm:text-xl lg:text-2xl font-bold" style={{color: '#212121'}}>Income Documents</h3>
               </div>
@@ -1011,7 +1011,7 @@ function Services() {
             <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 lg:p-8 shadow-lg">
               <div className="flex items-center mb-4 sm:mb-6 lg:mb-8">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 flex items-center justify-center mr-3 sm:mr-4">
-                  <img src={financialRecordsIcon} alt="Financial Records" className="w-full h-full" />
+                  <img src={financialRecordsIcon} alt="Financial Records" className="w-full h-full" loading="lazy" />
                 </div>
                 <h3 className="text-lg sm:text-xl lg:text-2xl font-bold" style={{color: '#212121'}}>Financial Records</h3>
               </div>
@@ -1050,7 +1050,7 @@ function Services() {
             <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 lg:p-8 shadow-lg md:col-span-2 xl:col-span-1">
               <div className="flex items-center mb-4 sm:mb-6 lg:mb-8">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 flex items-center justify-center mr-3 sm:mr-4">
-                  <img src={propertyDocumentsIcon} alt="Property Documents" className="w-full h-full" />
+                  <img src={propertyDocumentsIcon} alt="Property Documents" className="w-full h-full" loading="lazy" />
                 </div>
                 <h3 className="text-lg sm:text-xl lg:text-2xl font-bold" style={{color: '#212121'}}>Property Documents</h3>
               </div>
@@ -1104,7 +1104,7 @@ function Services() {
               <div className="p-4 sm:p-6 lg:p-8">
                 <div className="flex items-start mb-4 sm:mb-6">
                   <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-full mr-3 sm:mr-4 flex-shrink-0 overflow-hidden">
-                    <img src={sarahChenImage} alt="The Chen Family" className="w-full h-full object-cover" />
+                    <img src={sarahChenImage} alt="The Chen Family" className="w-full h-full object-cover" loading="lazy" />
                   </div>
                   <div>
                     <h3 className="text-base sm:text-lg lg:text-xl font-bold" style={{color: '#212121'}}>The Chen Family</h3>
@@ -1143,7 +1143,7 @@ function Services() {
               <div className="p-4 sm:p-6 lg:p-8">
                 <div className="flex items-start mb-4 sm:mb-6">
                   <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-full mr-3 sm:mr-4 flex-shrink-0 overflow-hidden">
-                    <img src={rajeshPatelImage} alt="Rajesh & Priya Patel" className="w-full h-full object-cover" />
+                    <img src={rajeshPatelImage} alt="Rajesh & Priya Patel" className="w-full h-full object-cover" loading="lazy" />
                   </div>
                   <div>
                     <h3 className="text-base sm:text-lg lg:text-xl font-bold" style={{color: '#212121'}}>Rajesh & Priya Patel</h3>
