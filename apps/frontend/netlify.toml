@@ -6,11 +6,15 @@
   publish = "dist"
   
   # Default build command
-  command = "npm run build"
+  command = "npm run netlify-build"
 
 [build.environment]
   # Node version
   NODE_VERSION = "18"
+  # Fix for rollup optional dependencies
+  NPM_FLAGS = "--legacy-peer-deps"
+  # Force npm to install optional dependencies
+  NPM_CONFIG_OPTIONAL = "true"
 
 # Redirects for SPA routing
 [[redirects]]
