@@ -10,8 +10,8 @@ export default defineConfig({
       // Disable optional dependencies to avoid rollup issues
       external: [],
     },
-    // Optimize for production
-    minify: 'terser',
+    // Use esbuild for faster builds
+    minify: 'esbuild',
     sourcemap: false,
   },
   // Optimize dependencies
