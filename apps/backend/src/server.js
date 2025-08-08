@@ -55,6 +55,270 @@ const applicationUpload = upload.fields([
   { name: 'bankStatements', maxCount: 1 }
 ]);
 
+/**
+ * Sends confirmation emails to both the user and company
+ * @param {Object} bookingData - Calendly webhook payload with booking details
+ */
+const sendConfirmationEmails = async (bookingData) => {
+  try {
+    // Extract booking information from Calendly webhook
+    const {
+      payload: {
+        invitee: {
+          name: inviteeName,
+          email: inviteeEmail,
+          questions_and_answers: qaData
+        },
+        event: {
+          name: eventName,
+          start_time: startTime,
+          end_time: endTime
+        }
+      }
+    } = bookingData;
+
+    // Extract phone number from custom questions if available
+    let phoneNumber = '';
+    if (qaData && Array.isArray(qaData)) {
+      const phoneQuestion = qaData.find(qa => 
+        qa.question.toLowerCase().includes('phone') || 
+        qa.question.toLowerCase().includes('number')
+      );
+      if (phoneQuestion) {
+        phoneNumber = phoneQuestion.answer;
+      }
+    }
+
+    // Format the appointment time
+    const appointmentDate = new Date(startTime);
+    const formattedDate = appointmentDate.toLocaleDateString('en-CA', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    const formattedTime = appointmentDate.toLocaleTimeString('en-CA', {
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZoneName: 'short'
+    });
+
+    // Check if Gmail is configured (primary choice)
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+      console.log('Gmail configuration missing. Using SendGrid fallback.');
+      
+      // Fallback to SendGrid if Gmail not configured
+      if (!process.env.SENDGRID_API_KEY) {
+        console.log('SendGrid API key not configured. Booking saved to database only.');
+        return { success: true, message: 'Booking saved to database' };
+      }
+
+      const transporter = nodemailer.createTransport({
+        service: process.env.EMAIL_SERVICE || 'gmail',
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASSWORD
+        }
+      });
+
+      // Send email to user
+      const userMailOptions = {
+        from: process.env.EMAIL_USER,
+        to: inviteeEmail,
+        subject: `Confirmation: Your Mortgage Consultation on ${formattedDate}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #1B5E20;">Your Mortgage Consultation is Confirmed!</h2>
+            <p>Dear ${inviteeName},</p>
+            <p>Your mortgage consultation has been successfully scheduled.</p>
+            
+            <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h3 style="margin-top: 0; color: #1B5E20;">Appointment Details</h3>
+              <p><strong>Date:</strong> ${formattedDate}</p>
+              <p><strong>Time:</strong> ${formattedTime}</p>
+              <p><strong>Service:</strong> ${eventName}</p>
+              ${phoneNumber ? `<p><strong>Phone:</strong> ${phoneNumber}</p>` : ''}
+            </div>
+            
+            <p>Our mortgage specialist will contact you at the scheduled time. Please ensure you have the following documents ready:</p>
+            <ul>
+              <li>Government-issued photo ID</li>
+              <li>Recent pay stubs or employment letter</li>
+              <li>Bank statements (last 3 months)</li>
+              <li>Tax returns (last 2 years)</li>
+              <li>Any existing mortgage documents</li>
+            </ul>
+            
+            <p>If you need to reschedule or have any questions, please contact us at ${process.env.COMPANY_EMAIL || 'appointments@ourcompany.com'}.</p>
+            
+            <p>Best regards,<br>MortgageLink Canada Team</p>
+          </div>
+        `
+      };
+
+      // Send email to company
+      const companyMailOptions = {
+        from: process.env.EMAIL_USER,
+        to: process.env.COMPANY_EMAIL || process.env.EMAIL_USER,
+        subject: `New Appointment: ${inviteeName} - ${formattedDate}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #1B5E20;">New Mortgage Consultation Appointment</h2>
+            
+            <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h3 style="margin-top: 0; color: #1B5E20;">Appointment Details</h3>
+              <p><strong>Client Name:</strong> ${inviteeName}</p>
+              <p><strong>Email:</strong> ${inviteeEmail}</p>
+              ${phoneNumber ? `<p><strong>Phone:</strong> ${phoneNumber}</p>` : ''}
+              <p><strong>Date:</strong> ${formattedDate}</p>
+              <p><strong>Time:</strong> ${formattedTime}</p>
+              <p><strong>Service:</strong> ${eventName}</p>
+            </div>
+            
+            <p>This appointment was booked through the mortgage eligibility quiz on your website.</p>
+            
+            <p>Please prepare for this consultation and ensure all necessary materials are ready.</p>
+          </div>
+        `
+      };
+
+      // Send both emails
+      await Promise.all([
+        transporter.sendMail(userMailOptions),
+        transporter.sendMail(companyMailOptions)
+      ]);
+
+      console.log('✅ Confirmation emails sent via nodemailer');
+      return { success: true, message: 'Confirmation emails sent' };
+    }
+
+    // Use SendGrid as fallback if Gmail not configured
+    const sgMail = require('@sendgrid/mail');
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+    // Send email to user
+    const userEmail = {
+      to: inviteeEmail,
+      from: process.env.COMPANY_EMAIL || 'appointments@ourcompany.com',
+      subject: `Confirmation: Your Mortgage Consultation on ${formattedDate}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #1B5E20;">Your Mortgage Consultation is Confirmed!</h2>
+          <p>Dear ${inviteeName},</p>
+          <p>Your mortgage consultation has been successfully scheduled.</p>
+          
+          <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="margin-top: 0; color: #1B5E20;">Appointment Details</h3>
+            <p><strong>Date:</strong> ${formattedDate}</p>
+            <p><strong>Time:</strong> ${formattedTime}</p>
+            <p><strong>Service:</strong> ${eventName}</p>
+            ${phoneNumber ? `<p><strong>Phone:</strong> ${phoneNumber}</p>` : ''}
+          </div>
+          
+          <p>Our mortgage specialist will contact you at the scheduled time. Please ensure you have the following documents ready:</p>
+          <ul>
+            <li>Government-issued photo ID</li>
+            <li>Recent pay stubs or employment letter</li>
+            <li>Bank statements (last 3 months)</li>
+            <li>Tax returns (last 2 years)</li>
+            <li>Any existing mortgage documents</li>
+          </ul>
+          
+          <p>If you need to reschedule or have any questions, please contact us at ${process.env.COMPANY_EMAIL || 'appointments@ourcompany.com'}.</p>
+          
+          <p>Best regards,<br>MortgageLink Canada Team</p>
+        </div>
+      `
+    };
+
+    // Send email to company
+    const companyEmail = {
+      to: process.env.COMPANY_EMAIL || 'appointments@ourcompany.com',
+      from: process.env.COMPANY_EMAIL || 'appointments@ourcompany.com',
+      subject: `New Appointment: ${inviteeName} - ${formattedDate}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #1B5E20;">New Mortgage Consultation Appointment</h2>
+          
+          <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="margin-top: 0; color: #1B5E20;">Appointment Details</h3>
+            <p><strong>Client Name:</strong> ${inviteeName}</p>
+            <p><strong>Email:</strong> ${inviteeEmail}</p>
+            ${phoneNumber ? `<p><strong>Phone:</strong> ${phoneNumber}</p>` : ''}
+            <p><strong>Date:</strong> ${formattedDate}</p>
+            <p><strong>Time:</strong> ${formattedTime}</p>
+            <p><strong>Service:</strong> ${eventName}</p>
+          </div>
+          
+          <p>This appointment was booked through the mortgage eligibility quiz on your website.</p>
+          
+          <p>Please prepare for this consultation and ensure all necessary materials are ready.</p>
+        </div>
+      `
+    };
+
+    // Send both emails via SendGrid
+    await Promise.all([
+      sgMail.send(userEmail),
+      sgMail.send(companyEmail)
+    ]);
+
+    console.log('✅ Confirmation emails sent via SendGrid');
+    return { success: true, message: 'Confirmation emails sent' };
+
+  } catch (error) {
+    console.error('❌ Error sending confirmation emails:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+// POST /calendly - Handle Calendly webhook for invitee.created event
+app.post('/calendly', async (req, res) => {
+  try {
+    const { event_type, payload } = req.body;
+
+    // Verify this is an invitee.created event
+    if (event_type !== 'invitee.created') {
+      return res.status(200).json({ 
+        success: true, 
+        message: 'Webhook received but not an invitee.created event' 
+      });
+    }
+
+    console.log('📅 Calendly webhook received:', {
+      event_type,
+      invitee_name: payload.invitee.name,
+      invitee_email: payload.invitee.email,
+      event_name: payload.event.name,
+      start_time: payload.event.start_time
+    });
+
+    // Send confirmation emails
+    const emailResult = await sendConfirmationEmails(req.body);
+
+    if (emailResult.success) {
+      console.log('✅ Appointment confirmation processed successfully');
+      res.status(200).json({
+        success: true,
+        message: 'Appointment confirmation processed successfully'
+      });
+    } else {
+      console.error('❌ Failed to send confirmation emails:', emailResult.error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to send confirmation emails'
+      });
+    }
+
+  } catch (error) {
+    console.error('❌ Error processing Calendly webhook:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error processing webhook'
+    });
+  }
+});
+
 // Mock mortgage rates data
 const mortgageRates = [
   {

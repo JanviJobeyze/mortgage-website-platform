@@ -86,6 +86,11 @@ function Footer() {
                     {t('header.contact')}
                   </Link>
                 </li>
+                <li>
+                  <Link to="/first-time-home-buyer" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">
+                    First-Time Home Buyer
+                  </Link>
+                </li>
               </ul>
             </div>
 

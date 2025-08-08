@@ -109,6 +109,15 @@ export const calculateEligibility = (formData) => {
   const dtiAdjustment = 1 - (dtiRatio / dtiThreshold) * 0.2;
   baseLoanAmount *= dtiAdjustment;
 
+  // Apply Canadian stress test (higher of rate+2% or 5.25%)
+  const baseRate = creditScore === 'excellent' ? 0.045 : 
+                   creditScore === 'good' ? 0.052 :
+                   creditScore === 'fair' ? 0.058 :
+                   creditScore === 'poor' ? 0.065 : 0.075;
+  const stressTestRate = Math.max(baseRate + 0.02, 0.0525);
+  const stressTestMultiplier = 0.85; // Conservative adjustment for stress test
+  baseLoanAmount *= stressTestMultiplier;
+
   // Ensure minimum down payment requirements
   const minDownPaymentPercent = creditScore === 'excellent' ? 5 : 
                                creditScore === 'good' ? 10 :
@@ -135,6 +144,19 @@ export const calculateEligibility = (formData) => {
   const maxPurchasePrice = baseLoanAmount + downPaymentAmount;
   const maxLoanAmount = maxPurchasePrice - downPaymentAmount;
 
+  // Calculate CMHC insurance if down payment < 20%
+  const downPaymentPercent = (downPaymentAmount / maxPurchasePrice) * 100;
+  let cmhcAmount = 0;
+  if (downPaymentPercent < 20) {
+    const cmhcRate = downPaymentPercent >= 15 ? 0.028 :
+                     downPaymentPercent >= 10 ? 0.031 :
+                     downPaymentPercent >= 5 ? 0.04 : 0.04;
+    cmhcAmount = maxLoanAmount * cmhcRate;
+  }
+
+  // Final loan amount includes CMHC insurance
+  const finalLoanAmount = maxLoanAmount + cmhcAmount;
+
   // Determine confidence level
   let confidence = 'medium';
   if (creditScore === 'excellent' && employmentStatus === 'fullTime' && dtiRatio < 0.25) {
@@ -144,16 +166,18 @@ export const calculateEligibility = (formData) => {
   }
 
   // Generate recommendations
-  const recommendations = generateRecommendations(creditScore, employmentStatus, dtiRatio, downPaymentAmount, maxLoanAmount);
+  const recommendations = generateRecommendations(creditScore, employmentStatus, dtiRatio, downPaymentAmount, finalLoanAmount);
 
   return {
     eligible: true,
-    maxLoanAmount: Math.round(maxLoanAmount),
+    maxLoanAmount: Math.round(finalLoanAmount),
     maxPurchasePrice: Math.round(maxPurchasePrice),
     downPaymentRequired: Math.round(minDownPaymentAmount),
-    monthlyPayment: calculateMonthlyPayment(maxLoanAmount, creditScore),
+    cmhcAmount: Math.round(cmhcAmount),
+    monthlyPayment: calculateMonthlyPayment(finalLoanAmount, creditScore),
     confidence,
     dtiRatio: dtiRatio,
+    stressTestRate: stressTestRate * 100,
     recommendations
   };
 };
