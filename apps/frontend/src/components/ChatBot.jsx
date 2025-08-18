@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import VoiceBotIcon from '../assets/chat.png';
+import VoiceBotIcon from '../assets/Chat.png';
 import ChatBotIcon from '../assets/Marie_Dubois.png';
 import { faqKnowledgeBase, findBestFAQMatch, generateResponse } from '../data/faqData';
 
