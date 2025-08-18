@@ -1,28 +1,22 @@
+# netlify.toml (at repo root)
+
 [build]
-  # Directory to change to before starting a build
-  base = "apps/frontend"
-  
-  # Directory to publish (relative to root of your repo)
-  publish = "dist"
-  
-  # Default build command
-  command = "npm run netlify-build"
+  # Install from repo root so npm workspaces are honored
+  command = "npm ci && npm run -w apps/frontend build"
+  publish = "apps/frontend/dist"
 
 [build.environment]
-  # Node version
   NODE_VERSION = "20"
-  # Fix for rollup optional dependencies
-  NPM_FLAGS = "--legacy-peer-deps"
-  # Force npm to install optional dependencies
-  NPM_CONFIG_OPTIONAL = "true"
+  # Ensure optional deps (e.g., Rollup platform binary) are installed
+  NPM_FLAGS = "--include=optional"
 
-# Redirects for SPA routing
+# SPA routing (served from publish dir)
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
-# Headers for security and performance
+# Security headers
 [[headers]]
   for = "/*"
   [headers.values]
@@ -36,39 +30,3 @@
   for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
-
-# Cache images
-[[headers]]
-  for = "*.png"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "*.jpg"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "*.jpeg"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "*.gif"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "*.svg"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "*.webp"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "*.ico"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable" 
