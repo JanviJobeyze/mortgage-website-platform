@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { trackPageView, trackEnhancedPageView } from '../utils/analytics';
 
-// Custom hook to track page views automatically
-export const usePageTracking = () => {
+// Component to track page views automatically
+const PageTracker = () => {
   const location = useLocation();
 
   useEffect(() => {
@@ -25,6 +25,8 @@ export const usePageTracking = () => {
       }
     });
   }, [location]);
+
+  return null; // This component doesn't render anything
 };
 
 // Helper function to determine page type
@@ -57,4 +59,6 @@ const getPageSection = (pathname) => {
   if (pathname.includes('/learning-centre')) return 'education';
   if (pathname.includes('/news')) return 'news';
   return 'general';
-}; 
+};
+
+export default PageTracker; 

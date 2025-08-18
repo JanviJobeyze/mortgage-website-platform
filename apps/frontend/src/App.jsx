@@ -6,7 +6,7 @@ import ChatBot from './components/ChatBot';
 import ScrollToTop from './components/ScrollToTop';
 import VoiceReader from './components/VoiceReader';
 import SmartLoadingFallback from './components/SmartLoadingFallback';
-import { usePageTracking } from './hooks/usePageTracking';
+import PageTracker from './components/PageTracker';
 import { preloadAllLazyComponents } from './utils/preloadUtils';
 import Home from './pages/Home';
 import About from './pages/About';
@@ -25,6 +25,8 @@ import TestAPI from './pages/TestAPI';
 import Privacy from './pages/privacy';
 import Terms from './pages/terms';
 import Accessibility from './pages/accessibility';
+import EligibilityQuiz from './pages/EligibilityQuiz';
+import FirstTimeHomeBuyer from './pages/FirstTimeHomeBuyer';
 import './App.css';
 
 // Lazy load components for code splitting
@@ -78,7 +80,7 @@ function App() {
 
   return (
     <Router>
-      <PageTrackingWrapper />
+      <PageTracker />
       <ScrollToTop />
       <div className="min-h-screen bg-white flex flex-col">
         <Navigation />
@@ -113,6 +115,8 @@ function App() {
             <Route path="/results" element={<Results />} />
             <Route path="/learning-centre" element={<LearningCentre />} />
             <Route path="/apply" element={<Apply />} />
+            <Route path="/eligibility-quiz" element={<EligibilityQuiz />} />
+            <Route path="/first-time-home-buyer" element={<FirstTimeHomeBuyer />} />
             <Route path="/test-api" element={<TestAPI />} />
             <Route 
               path="/component-demo" 
@@ -134,11 +138,5 @@ function App() {
     </Router>
   );
 }
-
-// Wrapper component to handle page tracking
-const PageTrackingWrapper = () => {
-  usePageTracking();
-  return null;
-};
 
 export default App;

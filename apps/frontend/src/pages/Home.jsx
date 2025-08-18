@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import StarIcon from '../assets/Star.png';
@@ -16,6 +16,8 @@ import CalculatorIcon from '../assets/Calculator.png';
 import ChatBot from '../components/ChatBot';
 import { ResultCard } from '../components';
 import { loadProvinceRates } from '../utils/rateApiService';
+import MortgageCalculator from '../components/MortgageCalculator';
+import BannerVideo from '../assets/banner_video.mp4';
 
 
 function Home() {
@@ -23,21 +25,11 @@ function Home() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const videoRef = useRef(null);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
 
-  // Calculator state
-  const [calculatorData, setCalculatorData] = useState({
-    loanType: 'Home Purchase',
-    province: 'Ontario',
-    homePrice: '',
-    downPayment: '',
-    interestRate: '',
-    amortization: '',
-    paymentFrequency: 'Monthly'
-  });
-
-  const [monthlyPayment, setMonthlyPayment] = useState('$0');
-  const [loanAmount, setLoanAmount] = useState('$0');
-  const [showResult, setShowResult] = useState(false);
+  // Calculator functionality now handled by MortgageCalculator component
 
   // Rates state
   const [topRates, setTopRates] = useState([]);
@@ -119,78 +111,27 @@ function Home() {
     setEmail('');
   };
 
-  // Calculate mortgage payment
-  const calculatePayment = () => {
-    const homePrice = parseFloat(calculatorData.homePrice.replace(/,/g, '')) || 0;
-    const downPayment = parseFloat(calculatorData.downPayment.replace(/,/g, '')) || 0;
-    const interestRate = parseFloat(calculatorData.interestRate) || 0;
-    const amortization = parseFloat(calculatorData.amortization) || 0;
+  // Calculator functionality now handled by MortgageCalculator component
 
-    if (homePrice <= 0 || interestRate <= 0 || amortization <= 0) {
-      setMonthlyPayment('$0');
-      setLoanAmount('$0');
-      setShowResult(false);
-      return;
+  // Video controls
+  const togglePlayPause = () => {
+    const el = videoRef.current;
+    if (!el) return;
+    if (el.paused) {
+      el.play();
+      setIsVideoPlaying(true);
+    } else {
+      el.pause();
+      setIsVideoPlaying(false);
     }
-
-    const calculatedLoanAmount = homePrice - downPayment;
-    if (calculatedLoanAmount <= 0) {
-      setMonthlyPayment('$0');
-      setLoanAmount('$0');
-      setShowResult(false);
-      return;
-    }
-
-    // Convert annual interest rate to monthly rate
-    const monthlyRate = interestRate / 100 / 12;
-    const totalPayments = amortization * 12;
-
-    // Calculate monthly payment using the formula: P = L[c(1 + c)^n]/[(1 + c)^n – 1]
-    const monthlyPaymentAmount = calculatedLoanAmount * 
-      (monthlyRate * Math.pow(1 + monthlyRate, totalPayments)) / 
-      (Math.pow(1 + monthlyRate, totalPayments) - 1);
-
-    // Format the results
-    const formattedPayment = new Intl.NumberFormat('en-CA', {
-      style: 'currency',
-      currency: 'CAD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(monthlyPaymentAmount);
-
-    const formattedLoanAmount = new Intl.NumberFormat('en-CA', {
-      style: 'currency',
-      currency: 'CAD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(calculatedLoanAmount);
-
-    setMonthlyPayment(formattedPayment);
-    setLoanAmount(formattedLoanAmount);
-    setShowResult(true);
   };
 
-  // Handle input changes
-  const handleInputChange = (field, value) => {
-    setCalculatorData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    
-    // Auto-calculate when values change
-    setTimeout(() => {
-      calculatePayment();
-    }, 100);
+  const toggleMute = () => {
+    const el = videoRef.current;
+    if (!el) return;
+    el.muted = !el.muted;
+    setIsMuted(el.muted);
   };
-
-  // Format currency inputs
-  const formatCurrency = (value) => {
-    const numericValue = value.replace(/[^0-9]/g, '');
-    if (numericValue === '') return '';
-    return new Intl.NumberFormat('en-CA').format(parseInt(numericValue));
-  };
-
-  // Update input handlers with calculation and formatting
 
 
 
@@ -199,12 +140,12 @@ function Home() {
     <div className="min-h-screen">
       <main id="main">
         {/* Hero Section */}
-        <section className="bg-[#C8E6C9] py-8 sm:py-12 md:py-16 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-center">
-            {/* Left Content */}
-            <div className="space-y-4 md:space-y-6 text-left md:text-center lg:text-left">
-              <div className="bg-[#FFE0B2] text-[#E65100] px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium inline-flex items-center w-fit mx-auto md:mx-auto lg:mx-0">
+                <section className="bg-[#C8E6C9] py-6 sm:py-8 px-4">
+        <div className="max-w-[1400px] mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 items-center">
+              {/* Left Content + Mini Quiz */}
+              <div className="space-y-3 md:space-y-4 text-left md:text-center lg:text-left">
+                <div className="bg-[#FFE0B2] text-[#E65100] px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium inline-flex items-center w-fit mx-auto md:mx-auto lg:mx-0">
                 <img src={StarIcon} alt="Star" className="w-3 h-3 sm:w-4 sm:h-4 mr-2" loading="lazy" />
                 <span className="whitespace-nowrap">{t('home.hero.trustedBadge')}</span>
               </div>
@@ -225,14 +166,14 @@ function Home() {
                   <div className="text-left py-2">
                     <div className="text-xs text-[#9CA3AF] mb-1 sm:mb-2">{t('home.hero.currentBestRate')}</div>
                     <div className="text-xl sm:text-2xl font-bold text-[#1B5E20] mb-1">
-                      {ratesLoading ? '...' : topRates.length > 0 ? `${topRates[0]?.rate}%` : '2.89%'}
+                      {ratesLoading ? '...' : topRates.length > 0 ? `${topRates.find(r => r.type === 'Fixed')?.rate}%` : '2.89%'}
                     </div>
                     <div className="text-xs text-[#9CA3AF]">{t('home.hero.fiveYearFixed')}</div>
                   </div>
                   <div className="text-right py-2">
                     <div className="text-xs text-[#9CA3AF] mb-1 sm:mb-2">{t('home.hero.variableRate')}</div>
                     <div className="text-xl sm:text-2xl font-bold text-[#1B5E20] mb-1">
-                      {ratesLoading ? '...' : topRates.length > 1 ? `${topRates[1]?.rate}%` : '3.15%'}
+                      {ratesLoading ? '...' : topRates.length > 0 ? `${topRates.find(r => r.type === 'Variable')?.rate}%` : '3.15%'}
                     </div>
                     <div className="text-xs text-[#9CA3AF]">{t('home.hero.primePlus')}</div>
                   </div>
@@ -241,11 +182,11 @@ function Home() {
               
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center md:justify-center lg:justify-start">
                 <button 
-                  onClick={() => navigate('/pre-qualify')}
+                  onClick={() => navigate('/eligibility-quiz')}
                   onMouseEnter={() => {
                     const link = document.createElement('link');
                     link.rel = 'prefetch';
-                    link.href = '/pre-qualify';
+                    link.href = '/eligibility-quiz';
                     link.as = 'document';
                     document.head.appendChild(link);
                     setTimeout(() => {
@@ -267,90 +208,263 @@ function Home() {
                   <span>View All Rates</span>
                 </button>
               </div>
+
+              {/* Quick link to Eligibility Quiz is provided by the CTA above */}
                         </div>
             
-            {/* Quick Payment Calculator */}
-            <div className="bg-[#FFFFFF] rounded-lg shadow-lg p-4 sm:p-6">
-              <h3 className="text-lg sm:text-xl font-bold text-[#212121] mb-4 sm:mb-6">{t('home.calculator.title')}</h3>
-              
-              <div className="space-y-3 sm:space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-[#374151] mb-2">{t('home.calculator.loanAmount')}</label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF] text-sm">$</span>
-                    <input
-                      type="text"
-                      value={calculatorData.homePrice}
-                      onChange={(e) => handleInputChange('homePrice', formatCurrency(e.target.value))}
-                      placeholder="500,000"
-                      className="w-full pl-7 sm:pl-8 pr-4 py-2.5 sm:py-2 border border-[#D1D5DB] rounded-lg focus:ring-2 focus:ring-[#1B5E20] focus:border-transparent bg-[#FFFFFF] text-[#212121] text-sm sm:text-base"
-                    />
-                  </div>
+            {/* Right: Hero Video */}
+            <div className="w-full lg:h-[380px] xl:h-[420px]">
+              <div className="group relative rounded-2xl overflow-hidden shadow-2xl border border-white/40 ring-1 ring-black/5 h-full">
+                <video
+                  ref={videoRef}
+                  src={BannerVideo}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                  autoPlay
+                  muted={isMuted}
+                  loop
+                  playsInline
+                  onPlay={() => setIsVideoPlaying(true)}
+                  onPause={() => setIsVideoPlaying(false)}
+                  poster="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
+                />
+
+                {/* Gradient overlays */}
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
+                <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-tr from-emerald-500/10 to-transparent"></div>
+
+                {/* Top-left label */}
+                <div className="absolute top-3 left-3">
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-white/90 text-[#1B5E20] shadow">
+                    Featured: How Mortgage Approval Works
+                  </span>
                 </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-[#374151] mb-2">{t('home.calculator.downPayment')}</label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF] text-sm">$</span>
-                    <input
-                      type="text"
-                      value={calculatorData.downPayment}
-                      onChange={(e) => handleInputChange('downPayment', formatCurrency(e.target.value))}
-                      placeholder="100,000"
-                      className="w-full pl-7 sm:pl-8 pr-4 py-2.5 sm:py-2 border border-[#D1D5DB] rounded-lg focus:ring-2 focus:ring-[#1B5E20] focus:border-transparent bg-[#FFFFFF] text-[#212121] text-sm sm:text-base"
-                    />
-                  </div>
+
+                {/* Controls */}
+                <div className="absolute bottom-3 right-3 flex items-center gap-2">
+                  <button
+                    onClick={togglePlayPause}
+                    className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/90 text-[#1B5E20] hover:bg-white transition-colors shadow"
+                    aria-label={isVideoPlaying ? 'Pause video' : 'Play video'}
+                  >
+                    {isVideoPlaying ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                        <path d="M6.75 5.25a.75.75 0 0 1 .75.75v12a.75.75 0 0 1-1.5 0v-12a.75.75 0 0 1 .75-.75zm9 0a.75.75 0 0 1 .75.75v12a.75.75 0 0 1-1.5 0v-12a.75.75 0 0 1 .75-.75z" />
+                      </svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                        <path d="M5.25 4.5v15l13.5-7.5-13.5-7.5z" />
+                      </svg>
+                    )}
+                  </button>
+                  <button
+                    onClick={toggleMute}
+                    className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/90 text-[#1B5E20] hover:bg-white transition-colors shadow"
+                    aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+                  >
+                    {isMuted ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                        <path d="M3 10v4h4l5 5V5L7 10H3zm13.59 2l2.7 2.7 1.41-1.41-2.7-2.7 2.7-2.7L19.29 6.5l-2.7 2.7-2.7-2.7-1.41 1.41 2.7 2.7-2.7 2.7 1.41 1.41 2.7-2.7z" />
+                      </svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                        <path d="M3 10v4h4l5 5V5L7 10H3zm10.5-4.5v2.09c2.89.86 5 3.54 5 6.41s-2.11 5.55-5 6.41v2.09c4.01-.91 7-4.49 7-8.5s-2.99-7.59-7-8.5z" />
+                      </svg>
+                    )}
+                  </button>
                 </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-[#374151] mb-2">{t('home.calculator.amortization')}</label>
-                    <input
-                      type="text"
-                      value={calculatorData.amortization}
-                      onChange={(e) => handleInputChange('amortization', e.target.value)}
-                      placeholder="25"
-                      className="w-full px-4 py-2.5 sm:py-2 border border-[#D1D5DB] rounded-lg focus:ring-2 focus:ring-[#1B5E20] focus:border-transparent bg-[#FFFFFF] text-[#212121] text-sm sm:text-base"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-[#374151] mb-2">{t('home.calculator.rate')}</label>
-                    <input
-                      type="text"
-                      value={calculatorData.interestRate}
-                      onChange={(e) => handleInputChange('interestRate', e.target.value)}
-                      placeholder="2.89"
-                      className="w-full px-4 py-2.5 sm:py-2 border border-[#D1D5DB] rounded-lg focus:ring-2 focus:ring-[#1B5E20] focus:border-transparent bg-[#FFFFFF] text-[#212121] text-sm sm:text-base"
-                    />
-                  </div>
-                </div>
-                
-                <div className="bg-[#F5F5F5] p-3 sm:p-4 rounded-lg">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-[#757575]">{t('home.calculator.monthlyPayment')}</span>
-                    <span className="text-xl sm:text-2xl font-bold text-[#212121]">{monthlyPayment}</span>
-                  </div>
-                </div>
-                
-                <button 
-                  onClick={calculatePayment}
-                  className="w-full bg-[#1B5E20] text-[#FFFFFF] py-3 rounded-lg font-semibold hover:bg-[#2E7D32] transition-colors text-center block text-sm sm:text-base mb-3"
-                >
-                  Calculate Payment
-                </button>
-                
-                <Link 
-                  to="/calculator"
-                  className="w-full bg-[#FF6F00] text-[#FFFFFF] py-3 rounded-lg font-semibold hover:bg-[#E65100] transition-colors text-center block text-sm sm:text-base"
-                >
-                  {t('home.calculator.viewDetailedCalculator')}
-                </Link>
               </div>
+              <p className="text-xs text-[#2E7D32] mt-2 text-center lg:text-right">Informational video. Results may vary.</p>
             </div>
           </div>
         </div>
       </section>
+{/* Current Mortgage Rates Section */}
+<section className="py-12 px-4 bg-[#F8F9FA]">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-8">
+           
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#212121] mb-4">
+              Current Mortgage Rates
+            </h2>
+            <p className="text-[#757575] text-lg max-w-3xl mx-auto leading-relaxed">
+              Stay ahead with real-time rates from Canada's top lenders. Compare and find the perfect mortgage rate for your needs.
+            </p>
+          </div>
 
+          {/* Main Content */}
+          <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8">
+            {/* Loading State */}
+            {ratesLoading && (
+              <div className="text-center py-12">
+                <div className="inline-flex items-center space-x-3">
+                  <div className="relative">
+                    <div className="w-8 h-8 border-4 border-[#1B5E20]/20 border-t-[#1B5E20] rounded-full animate-spin"></div>
+                  </div>
+                  <span className="text-lg text-gray-600">Loading current rates...</span>
+                </div>
+              </div>
+            )}
+
+            {/* Error State */}
+            {ratesError && !ratesLoading && (
+              <div role="alert" className="bg-red-100 text-red-700 p-4 rounded-lg text-center mb-8">
+                <div className="flex items-center justify-center space-x-2">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                  <span className="font-medium">{ratesError}</span>
+                </div>
+              </div>
+            )}
+
+            {/* Best Rate Highlight */}
+            {!ratesLoading && !ratesError && topRates.length > 0 && (
+              <div className="mb-6 p-4 bg-[#F8F9FA] rounded-lg">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div className="text-center sm:text-left">
+                    <div className="inline-flex items-center px-3 py-1 bg-[#1B5E20] text-white rounded-full text-xs font-semibold mb-3">
+                      <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      Best Rate Available
+                    </div>
+                    <div className="space-y-2">
+                      <div className="text-2xl sm:text-3xl font-bold text-[#1B5E20]">
+                        {topRates[0]?.rate}%
+                      </div>
+                      <div className="text-sm sm:text-base text-gray-600">
+                        {typeof topRates[0]?.lender?.name === 'string' ? topRates[0].lender.name : 'Unknown Lender'} • {topRates[0]?.type} • {topRates[0]?.term}
+                      </div>
+                      <div className="text-xs sm:text-sm text-gray-500">
+                        APR: {topRates[0]?.apr}% • Home Purchase
+                      </div>
+                    </div>
+                  </div>
+                  <div className="sm:text-right">
+                    <div className="inline-flex items-center px-4 py-2 bg-white rounded-lg shadow-sm border border-[#1B5E20]/20">
+                      <svg className="w-4 h-4 text-[#1B5E20] mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <span className="text-xs font-medium text-[#1B5E20]">Updated Today</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Rates List - Row style, responsive */}
+            {!ratesLoading && !ratesError && topRates.length > 0 && (
+              <div className="space-y-2.5 mb-4">
+                {topRates.map((rate, index) => (
+                  <div
+                    key={index}
+                    className={`group rounded-lg border p-2.5 sm:p-3 bg-white hover:shadow-md transition ${
+                      index === 0
+                        ? 'border-[#1B5E20] ring-1 ring-[#1B5E20]/20 bg-[#F8F9FA]'
+                        : 'border-gray-200'
+                    }`}
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-10 md:items-center gap-2.5">
+                      {/* Left: Lender */}
+                      <div className="flex items-center min-w-0 gap-3 md:col-span-4">
+                        <div
+                          className={`w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0 ${
+                            rate.lender?.color || 'bg-gray-600'
+                          }`}
+                        >
+                          {typeof rate.lender?.logo === 'string' ? rate.lender.logo : '🏦'}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-semibold text-gray-900 text-xs sm:text-sm truncate">
+                            {typeof rate.lender?.name === 'string' ? rate.lender.name : 'Unknown Lender'}
+                          </div>
+                          <div className="text-[11px] text-gray-500 truncate">
+                            {typeof rate.lender?.type === 'string' ? rate.lender.type : 'Major Bank'}
+                          </div>
+                        </div>
+                        {index === 0 && (
+                          <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full bg-[#1B5E20] text-white text-[10px] font-semibold flex-shrink-0">
+                            Best
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Middle: Rate and tags */}
+                      <div className="md:col-span-4 grid grid-cols-2 gap-2 sm:gap-3 items-center">
+                        <div className="text-center">
+                          <div className="text-lg sm:text-xl font-bold text-[#1B5E20] leading-none">{rate.rate}%</div>
+                          <div className="text-[10px] text-gray-500">
+                            Annual Rate{rate.apr ? ` • APR ${rate.apr}%` : ''}
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-center gap-2">
+                          <span
+                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium ${
+                              rate.type === 'Fixed'
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-blue-100 text-blue-800'
+                            }`}
+                          >
+                            {rate.type}
+                          </span>
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-gray-100 text-gray-700">
+                            {rate.term}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Right: CTAs */}
+                      <div className="md:col-span-2 flex flex-col sm:flex-row items-stretch md:justify-end gap-1.5">
+                        <button
+                          onClick={() => navigate('/apply')}
+                          className="w-full sm:w-auto inline-flex items-center justify-center px-3 py-1.5 rounded-md bg-[#1B5E20] text-white text-xs font-semibold hover:bg-[#2E7D32] transition-colors"
+                        >
+                          Apply Now
+                        </button>
+                        <button
+                          onClick={() => navigate('/eligibility-quiz')}
+                          className="w-full sm:w-auto inline-flex items-center justify-center px-3 py-1.5 rounded-md border border-[#1B5E20] text-[#1B5E20] text-xs font-semibold hover:bg-[#F1F8E9] transition-colors"
+                        >
+                          Check Eligibility
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* No Rates State */}
+            {!ratesLoading && !ratesError && topRates.length === 0 && (
+              <div className="text-center py-8">
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-gray-100 rounded-full mb-3">
+                  <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <p className="text-gray-500 text-sm">No rates available at the moment. Please try again later.</p>
+              </div>
+            )}
+
+            {/* Call to Action */}
+            <div className="text-center">
+              <button 
+                onClick={() => navigate('/rates')}
+                className="inline-flex items-center px-6 py-3 bg-[#1B5E20] hover:bg-[#2E7D32] text-white font-semibold rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#1B5E20] focus:ring-offset-2 shadow-sm hover:shadow-md text-base"
+              >
+                <span>Explore All 20+ Rates</span>
+                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l7 7-7 7" />
+                </svg>
+              </button>
+              <p className="text-xs text-gray-500 mt-3">
+                Compare rates from all provinces and lenders
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
       {/* Comprehensive Mortgage Solutions */}
       <section className="py-8 sm:py-12 md:py-16 px-4 bg-[#FFFFFF]">
         <div className="max-w-7xl mx-auto text-center">
@@ -359,7 +473,7 @@ function Home() {
             {t('home.solutions.subtitle')}
           </p>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
             <div 
               onClick={() => navigate('/services')}
               className="group text-center p-4 sm:p-6 rounded-xl bg-white border border-transparent hover:border-[#1B5E20] hover:shadow-xl hover:bg-gradient-to-br hover:from-[#F1F8E9] hover:to-white transition-all duration-300 transform hover:-translate-y-2 sm:col-span-1 lg:col-span-1 cursor-pointer"
@@ -410,7 +524,7 @@ function Home() {
             
             <div 
               onClick={() => navigate('/services')}
-              className="group text-center p-4 sm:p-6 rounded-xl bg-white border border-transparent hover:border-[#FF6F00] hover:shadow-xl hover:bg-gradient-to-br hover:from-[#FFF3E0] hover:to-white transition-all duration-300 transform hover:-translate-y-2 sm:col-span-2 lg:col-span-1 cursor-pointer"
+              className="group text-center p-4 sm:p-6 rounded-xl bg-white border border-transparent hover:border-[#FF6F00] hover:shadow-xl hover:bg-gradient-to-br hover:from-[#FFF3E0] hover:to-white transition-all duration-300 transform hover:-translate-y-2 cursor-pointer"
             >
               <div className="flex justify-center mb-3 sm:mb-4">
                 <img 
@@ -431,410 +545,71 @@ function Home() {
                 </svg>
               </button>
             </div>
+            
+            {/* First-Time Home Buyer Card */}
+            <div 
+              onClick={() => navigate('/first-time-home-buyer')}
+              className="group text-center p-4 sm:p-6 rounded-xl bg-white border border-transparent hover:border-[#4CAF50] hover:shadow-xl hover:bg-gradient-to-br hover:from-[#E8F5E8] hover:to-white transition-all duration-300 transform hover:-translate-y-2 cursor-pointer"
+            >
+              <div className="flex justify-center mb-3 sm:mb-4">
+                <svg className="w-12 h-12 sm:w-16 sm:h-16 text-[#4CAF50] transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5V3a2 2 0 012-2h4a2 2 0 012 2v2" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 12h.01" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 13h18M3 17h18" />
+                </svg>
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-[#212121] mb-2 sm:mb-3 group-hover:text-[#4CAF50] transition-colors duration-300">First-Time Home Buyer</h3>
+              <p className="text-sm sm:text-base text-[#757575] mb-3 sm:mb-4 group-hover:text-[#374151] transition-colors duration-300 leading-relaxed">
+                Discover all the programs, benefits, and incentives available for first-time home buyers in Canada.
+              </p>
+              <button className="text-[#4CAF50] font-semibold hover:text-[#388E3C] transition-all duration-300 group-hover:scale-105 inline-flex items-center text-sm sm:text-base">
+                Explore Programs 
+                <svg className="w-3 h-3 sm:w-4 sm:h-4 ml-1 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </section>
       
-      {/* Current Mortgage Rates Section */}
-      <section className="py-16 px-4 bg-[#F8F9FA]">
-        <div className="max-w-7xl mx-auto">
+      {/* Mortgage Calculator Section */}
+      <section className="py-8 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-[#1B5E20] rounded-full mb-6">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          <div className="text-center mb-6">
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#212121] mb-3">
+              Calculate Your Mortgage
+            </h2>
+            <p className="text-[#757575] text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+              Get instant mortgage payment estimates and explore different scenarios.
+            </p>
+          </div>
+
+          {/* Calculator Component */}
+          <div className="mb-8">
+            <MortgageCalculator isCompact={false} />
+          </div>
+
+          {/* Explore More Button */}
+          <div className="text-center">
+            <button
+              onClick={() => navigate('/calculator')}
+              className="inline-flex items-center px-5 py-2.5 bg-[#1B5E20] text-white font-semibold rounded-lg hover:bg-[#2E7D32] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#1B5E20] focus:ring-offset-2 shadow-sm hover:shadow-md text-sm"
+            >
+              Explore More Calculators
+              <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l7 7-7 7" />
               </svg>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#212121] mb-4">
-              Current Mortgage Rates
-            </h2>
-            <p className="text-[#757575] text-lg max-w-3xl mx-auto leading-relaxed">
-              Stay ahead with real-time rates from Canada's top lenders. Compare and find the perfect mortgage rate for your needs.
-            </p>
-          </div>
-
-          {/* Main Content */}
-          <div className="bg-white rounded-2xl shadow-xl p-8 sm:p-12">
-            {/* Loading State */}
-            {ratesLoading && (
-              <div className="text-center py-12">
-                <div className="inline-flex items-center space-x-3">
-                  <div className="relative">
-                    <div className="w-8 h-8 border-4 border-[#1B5E20]/20 border-t-[#1B5E20] rounded-full animate-spin"></div>
-                  </div>
-                  <span className="text-lg text-gray-600">Loading current rates...</span>
-                </div>
-              </div>
-            )}
-
-            {/* Error State */}
-            {ratesError && !ratesLoading && (
-              <div role="alert" className="bg-red-100 text-red-700 p-4 rounded-lg text-center mb-8">
-                <div className="flex items-center justify-center space-x-2">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                  </svg>
-                  <span className="font-medium">{ratesError}</span>
-                </div>
-              </div>
-            )}
-
-            {/* Best Rate Highlight */}
-            {!ratesLoading && !ratesError && topRates.length > 0 && (
-              <div className="mb-8 p-6 bg-[#F8F9FA] rounded-lg">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                  <div className="text-center sm:text-left">
-                    <div className="inline-flex items-center px-3 py-1 bg-[#1B5E20] text-white rounded-full text-xs font-semibold mb-3">
-                      <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      Best Rate Available
-                    </div>
-                    <div className="space-y-2">
-                      <div className="text-3xl sm:text-4xl font-bold text-[#1B5E20]">
-                        {topRates[0]?.rate}%
-                      </div>
-                      <div className="text-sm sm:text-base text-gray-600">
-                        {typeof topRates[0]?.lender?.name === 'string' ? topRates[0].lender.name : 'Unknown Lender'} • {topRates[0]?.type} • {topRates[0]?.term}
-                      </div>
-                      <div className="text-xs sm:text-sm text-gray-500">
-                        APR: {topRates[0]?.apr}% • Home Purchase
-                      </div>
-                    </div>
-                  </div>
-                  <div className="sm:text-right">
-                    <div className="inline-flex items-center px-4 py-2 bg-white rounded-lg shadow-sm border border-[#1B5E20]/20">
-                      <svg className="w-4 h-4 text-[#1B5E20] mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="text-xs font-medium text-[#1B5E20]">Updated Today</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Rates Cards Row */}
-            {!ratesLoading && !ratesError && topRates.length > 0 && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-                {topRates.map((rate, index) => (
-                  <div key={index} className={`group relative bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 border h-full ${
-                    index === 0 ? 'border-[#1B5E20] bg-[#F8F9FA]' : 'border-gray-200 hover:border-[#1B5E20]/30'
-                  }`}>
-                    {/* Best Rate Badge */}
-                    {index === 0 && (
-                      <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
-                        <div className="bg-[#1B5E20] text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md">
-                          Best Rate
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Lender Info */}
-                    <div className="flex items-center mb-3">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3 flex-shrink-0 ${
-                        rate.lender?.color || 'bg-gray-600'
-                      }`}>
-                        {typeof rate.lender?.logo === 'string' ? rate.lender.logo : '🏦'}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="font-semibold text-gray-900 text-sm truncate">{typeof rate.lender?.name === 'string' ? rate.lender.name : 'Unknown Lender'}</div>
-                        <div className="text-xs text-gray-500 truncate">{typeof rate.lender?.type === 'string' ? rate.lender.type : 'Major Bank'}</div>
-                      </div>
-                    </div>
-
-                    {/* Rate Display */}
-                    <div className="text-center mb-3">
-                      <div className="text-2xl font-bold text-[#1B5E20] mb-1">
-                        {rate.rate}%
-                      </div>
-                      <div className="text-xs text-gray-600">
-                        Annual Rate
-                      </div>
-                    </div>
-
-                    {/* Rate Details */}
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-center space-x-2">
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                          rate.type === 'Fixed' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
-                        }`}>
-                          {rate.type}
-                        </span>
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-                          {rate.term}
-                        </span>
-                      </div>
-                      
-                      {/* Change Indicator */}
-                      {rate.change !== undefined && (
-                        <div className="flex items-center justify-center">
-                          <span className={`text-xs font-medium ${
-                            rate.change > 0 ? 'text-red-600' : rate.change < 0 ? 'text-green-600' : 'text-gray-600'
-                          }`}>
-                            {rate.change > 0 ? '↗' : rate.change < 0 ? '↘' : '→'} {rate.change > 0 ? '+' : ''}{rate.change || 0}%
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* No Rates State */}
-            {!ratesLoading && !ratesError && topRates.length === 0 && (
-              <div className="text-center py-8">
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-gray-100 rounded-full mb-3">
-                  <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
-                <p className="text-gray-500 text-sm">No rates available at the moment. Please try again later.</p>
-              </div>
-            )}
-
-            {/* Call to Action */}
-            <div className="text-center">
-              <button 
-                onClick={() => navigate('/rates')}
-                className="inline-flex items-center px-6 py-3 bg-[#1B5E20] hover:bg-[#2E7D32] text-white font-semibold rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#1B5E20] focus:ring-offset-2 shadow-sm hover:shadow-md text-base"
-              >
-                <span>Explore All 20+ Rates</span>
-                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l7 7-7 7" />
-                </svg>
-              </button>
-              <p className="text-xs text-gray-500 mt-3">
-                Compare rates from all provinces and lenders
-              </p>
-            </div>
+            </button>
           </div>
         </div>
       </section>
 
+      
 
-      {/* Mortgage Payment Calculator Section */}
-      <section className="py-16 px-4 bg-[#1B5E20]">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-              Calculate Your Mortgage Payment
-            </h2>
-            <p className="text-[#C8E6C9] text-lg max-w-3xl mx-auto leading-relaxed">
-              Get instant calculations with our advanced mortgage calculator. See how different rates and terms affect your monthly payment.
-            </p>
-          </div>
-
-          <div className="max-w-5xl mx-auto">
-            <div className="bg-white rounded-xl shadow-lg p-6 sm:p-8">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                {/* Loan Type */}
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700">Loan Type</label>
-                  <select 
-                    value={calculatorData.loanType}
-                    onChange={(e) => handleInputChange('loanType', e.target.value)}
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1B5E20] focus:border-transparent text-sm appearance-none bg-white"
-                  >
-                    <option>Home Purchase</option>
-                    <option>Refinancing</option>
-                    <option>Home Equity</option>
-                  </select>
-                </div>
-                
-                {/* Province */}
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700">Province</label>
-                  <select 
-                    value={calculatorData.province}
-                    onChange={(e) => handleInputChange('province', e.target.value)}
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1B5E20] focus:border-transparent text-sm appearance-none bg-white"
-                  >
-                    <option>Ontario</option>
-                    <option>Alberta</option>
-                    <option>British Columbia</option>
-                    <option>Manitoba</option>
-                    <option>New Brunswick</option>
-                    <option>Newfoundland and Labrador</option>
-                    <option>Nova Scotia</option>
-                    <option>Prince Edward Island</option>
-                    <option>Quebec</option>
-                    <option>Saskatchewan</option>
-                    <option>Northwest Territories</option>
-                    <option>Nunavut</option>
-                    <option>Yukon</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                {/* Home Price / Loan Amount */}
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700">Home Price / Loan Amount</label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
-                    <input 
-                      type="text" 
-                      value={calculatorData.homePrice}
-                      onChange={(e) => handleInputChange('homePrice', formatCurrency(e.target.value))}
-                      placeholder="500,000"
-                      className="w-full pl-8 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1B5E20] focus:border-transparent text-sm"
-                    />
-                  </div>
-                </div>
-                
-                {/* Down Payment */}
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700">Down Payment</label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
-                    <input 
-                      type="text" 
-                      value={calculatorData.downPayment}
-                      onChange={(e) => handleInputChange('downPayment', formatCurrency(e.target.value))}
-                      placeholder="100,000"
-                      className="w-full pl-8 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1B5E20] focus:border-transparent text-sm"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                {/* Interest Rate */}
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700">Interest Rate (%)</label>
-                  <input 
-                    type="text" 
-                    value={calculatorData.interestRate}
-                    onChange={(e) => handleInputChange('interestRate', e.target.value)}
-                    placeholder="2.89"
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1B5E20] focus:border-transparent text-sm"
-                  />
-                </div>
-                
-                {/* Amortization */}
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700">Amortization (Years)</label>
-                  <input 
-                    type="text" 
-                    value={calculatorData.amortization}
-                    onChange={(e) => handleInputChange('amortization', e.target.value)}
-                    placeholder="25"
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1B5E20] focus:border-transparent text-sm"
-                  />
-                </div>
-                
-                {/* Payment Frequency */}
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700">Payment Frequency</label>
-                  <select 
-                    value={calculatorData.paymentFrequency}
-                    onChange={(e) => handleInputChange('paymentFrequency', e.target.value)}
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1B5E20] focus:border-transparent text-sm appearance-none bg-white"
-                  >
-                    <option>Monthly</option>
-                    <option>Bi-weekly</option>
-                    <option>Weekly</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Result Display */}
-              {showResult && (
-                <div className="mb-6 p-6 bg-[#E8F5E8] border border-[#1B5E20] rounded-lg">
-                  <h3 className="text-lg font-bold text-[#1B5E20] mb-4">Mortgage Calculation Results</h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Left Column - Key Figures */}
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center p-3 bg-white rounded-lg border border-[#1B5E20]/20">
-                        <span className="text-sm font-medium text-[#1B5E20]">Monthly Payment:</span>
-                        <span className="text-xl font-bold text-[#1B5E20]">{monthlyPayment}</span>
-                      </div>
-                      
-                      <div className="flex justify-between items-center p-3 bg-white rounded-lg border border-[#1B5E20]/20">
-                        <span className="text-sm font-medium text-[#1B5E20]">Principal:</span>
-                        <span className="text-lg font-semibold text-[#1B5E20]">{loanAmount}</span>
-                      </div>
-                      
-                      <div className="flex justify-between items-center p-3 bg-white rounded-lg border border-[#1B5E20]/20">
-                        <span className="text-sm font-medium text-[#1B5E20]">Down Payment:</span>
-                        <span className="text-lg font-semibold text-[#1B5E20]">
-                          {calculatorData.downPayment ? `$${calculatorData.downPayment}` : '$0'}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    {/* Right Column - Additional Details */}
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center p-3 bg-white rounded-lg border border-[#1B5E20]/20">
-                        <span className="text-sm font-medium text-[#1B5E20]">Home Price:</span>
-                        <span className="text-lg font-semibold text-[#1B5E20]">
-                          {calculatorData.homePrice ? `$${calculatorData.homePrice}` : '$0'}
-                        </span>
-                      </div>
-                      
-                      <div className="flex justify-between items-center p-3 bg-white rounded-lg border border-[#1B5E20]/20">
-                        <span className="text-sm font-medium text-[#1B5E20]">Interest Rate:</span>
-                        <span className="text-lg font-semibold text-[#1B5E20]">
-                          {calculatorData.interestRate ? `${calculatorData.interestRate}%` : '0%'}
-                        </span>
-                      </div>
-                      
-                      <div className="flex justify-between items-center p-3 bg-white rounded-lg border border-[#1B5E20]/20">
-                        <span className="text-sm font-medium text-[#1B5E20]">Amortization:</span>
-                        <span className="text-lg font-semibold text-[#1B5E20]">
-                          {calculatorData.amortization ? `${calculatorData.amortization} years` : '0 years'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-4 p-3 bg-[#1B5E20]/10 rounded-lg">
-                    <p className="text-sm text-[#1B5E20] text-center">
-                      <span className="font-medium">Note:</span> This is an estimate. Actual rates and payments may vary based on your specific situation and lender terms.
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-                <button 
-                  onClick={calculatePayment}
-                  className="w-full sm:w-auto px-8 py-3 bg-[#FF6F00] hover:bg-[#E65100] text-white font-semibold rounded-lg transition-colors duration-200 text-base"
-                >
-                  Calculate Payment
-                </button>
-                
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <button 
-                    onClick={() => navigate('/calculator')}
-                    className="px-6 py-2.5 text-[#1B5E20] bg-[#E8F5E8] hover:bg-[#C8E6C9] font-medium rounded-lg transition-colors duration-200 text-sm border border-[#1B5E20]"
-                  >
-                    View Detailed Calculator
-                  </button>
-                  <button 
-                    onClick={() => navigate('/services')}
-                    className="px-6 py-2.5 text-[#1B5E20] bg-white hover:bg-gray-50 font-medium rounded-lg transition-colors duration-200 text-sm border border-[#1B5E20]"
-                  >
-                    Get Pre-Approved
-                  </button>
-                </div>
-              </div>
-              
-              {/* Calculator Disclaimer */}
-              <div className="mt-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                <p className="text-sm text-gray-600">
-                  <span className="font-medium text-gray-700">Disclaimer:</span> 
-                  Results are estimates only and do not constitute pre-approval or guarantee of terms. 
-                  Consult with a mortgage professional for advice based on your specific situation.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+     
 
       {/* Trusted & Regulated */}
       <section className="py-16 px-4 bg-[#F8F9FA]">
@@ -942,8 +717,8 @@ function Home() {
         </div>
       </section>
 
-      {/* Pre-Qualification Quiz Section */}
-      <section className="py-16 px-4 bg-[#F8F9FA]">
+      {/* Pre-Qualification Quiz Section - COMMENTED OUT */}
+      {/* <section className="py-16 px-4 bg-[#F8F9FA]">
         <div className="max-w-7xl mx-auto">
           <div className="bg-white rounded-2xl shadow-xl p-8 sm:p-12">
             <div className="text-center mb-12">
@@ -1025,8 +800,58 @@ function Home() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
+{/* Check Eligibility CTA Section */}
+<section className="py-12 sm:py-16 md:py-20 px-4 bg-gradient-to-br from-[#E8F5E8] to-[#C8E6C9]">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="mb-8">
+            {/* <div className="inline-flex items-center justify-center w-16 h-16 bg-[#1B5E20] rounded-full mb-6">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div> */}
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#1B5E20] mb-4">
+              Ready to Buy Your Dream Home?
+            </h2>
+            <p className="text-lg sm:text-xl text-[#2E7D32] mb-8 max-w-2xl mx-auto leading-relaxed">
+              Take our quick 2-minute eligibility quiz and discover if you qualify for a mortgage. 
+              Get instant results and connect with our licensed specialists.
+            </p>
+          </div>
 
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-8">
+            <div className="flex items-center text-[#1B5E20]">
+              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <span className="font-medium">2-Minute Quiz</span>
+            </div>
+            <div className="flex items-center text-[#1B5E20]">
+              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <span className="font-medium">Instant Results</span>
+            </div>
+            <div className="flex items-center text-[#1B5E20]">
+              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <span className="font-medium">Free Consultation</span>
+            </div>
+          </div>
+
+          <Link 
+            to="/eligibility-quiz"
+            className="inline-block bg-[#1B5E20] text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-[#2E7D32] transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+          >
+            Check My Eligibility Now →
+          </Link>
+
+          <p className="text-sm text-[#2E7D32] mt-4 opacity-80">
+             Your information is secure and confidential
+          </p>
+        </div>
+      </section>
       {/* What Our Clients Say */}
       <section className="py-8 sm:py-12 md:py-16 px-4 bg-[#FFFFFF]">
         <div className="max-w-7xl mx-auto text-center">
@@ -1104,6 +929,8 @@ function Home() {
           </div>
         </div>
       </section>
+
+      
 
       {/* Stay Updated Newsletter */}
       <section className="py-8 sm:py-12 md:py-16 px-4 bg-[#1B5E20]">

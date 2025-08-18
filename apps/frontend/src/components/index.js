@@ -6,4 +6,6 @@ export { default as VoiceReader } from './VoiceReader';
 export { default as ResultCard } from './ResultCard';
 export { default as RatesSnapshot } from './RatesSnapshot';
 export { default as RateComparison } from './RateComparison';
-export { default as MiniMortgageCalculator } from './MiniMortgageCalculator'; 
+export { default as MiniMortgageCalculator } from './MiniMortgageCalculator';
+export { default as AffordabilityCalculator } from './AffordabilityCalculator';
+export { default as ContactForm } from './ContactForm'; 

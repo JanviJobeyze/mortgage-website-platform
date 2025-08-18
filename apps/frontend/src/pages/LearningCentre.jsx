@@ -182,99 +182,114 @@ function LearningCentre() {
         </div>
       </section>
 
-      {/* Main Content */}
-      <section className="py-6 sm:py-8 md:py-12 lg:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          {/* Category Filters */}
-          <section className="mb-8 sm:mb-12" aria-labelledby="category-filters-heading">
-            <h2 id="category-filters-heading" className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6">
-              Filter by Category
-            </h2>
-            <div className="flex flex-wrap gap-2 sm:gap-3" role="group" aria-label="Category filter options">
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  onClick={() => handleCategoryClick(category)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#1B5E20] focus:ring-offset-2 ${
-                    selectedCategory === category
-                      ? 'bg-[#1B5E20] text-white shadow-md'
-                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 hover:border-gray-300'
-                  }`}
-                  aria-pressed={selectedCategory === category}
-                  aria-label={`Filter by ${category} category`}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-          </section>
+             {/* Main Content */}
+       <section className="py-6 sm:py-8 md:py-12 lg:py-16">
+         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+           
+           {/* Two Column Layout */}
+           <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+             
+             {/* Sidebar Filters */}
+             <div className="lg:w-80 flex-shrink-0">
+               <div className="bg-white rounded-lg shadow-md p-6 sticky top-6">
+                 
+                 {/* Category Filters */}
+                 <section className="mb-8" aria-labelledby="category-filters-heading">
+                   <h2 id="category-filters-heading" className="text-lg font-semibold text-gray-900 mb-4">
+                     Filter by Category
+                   </h2>
+                   <div className="space-y-2" role="group" aria-label="Category filter options">
+                     {categories.map((category) => (
+                       <button
+                         key={category}
+                         onClick={() => handleCategoryClick(category)}
+                         className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#1B5E20] focus:ring-offset-2 ${
+                           selectedCategory === category
+                             ? 'bg-[#1B5E20] text-white shadow-md'
+                             : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200 hover:border-gray-300'
+                         }`}
+                         aria-pressed={selectedCategory === category}
+                         aria-label={`Filter by ${category} category`}
+                       >
+                         {category}
+                       </button>
+                     ))}
+                   </div>
+                 </section>
 
-          {/* Tag Filters */}
-          <section className="mb-8 sm:mb-12" aria-labelledby="tag-filters-heading">
-            <h3 id="tag-filters-heading" className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">
-              Filter by Tags
-            </h3>
-            <div className="flex flex-wrap gap-2 sm:gap-3" role="group" aria-label="Tag filter options">
-              {availableTags.map((tag) => (
-                <button
-                  key={tag}
-                  onClick={() => handleTagClick(tag)}
-                  className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#1B5E20] focus:ring-offset-2 ${
-                    selectedTags.includes(tag)
-                      ? 'bg-[#1B5E20] text-white shadow-sm'
-                      : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200 hover:border-gray-300'
-                  }`}
-                  aria-pressed={selectedTags.includes(tag)}
-                  aria-label={`Filter by ${tag} tag`}
-                >
-                  {tag}
-                </button>
-              ))}
-            </div>
-            {selectedTags.length > 0 && (
-              <div className="mt-4 flex items-center gap-2">
-                <span className="text-sm text-gray-600">Active filters:</span>
-                <div className="flex flex-wrap gap-2">
-                  {selectedTags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="inline-flex items-center px-2 py-1 bg-[#E8F5E8] text-[#1B5E20] text-xs font-medium rounded-full"
-                    >
-                      {tag}
-                      <button
-                        onClick={() => handleTagClick(tag)}
-                        className="ml-1 w-4 h-4 rounded-full hover:bg-[#1B5E20] hover:text-white transition-colors duration-200 flex items-center justify-center"
-                        aria-label={`Remove ${tag} filter`}
-                      >
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </span>
-                  ))}
-                </div>
-                <button
-                  onClick={() => setSelectedTags([])}
-                  className="text-sm text-[#1B5E20] hover:text-[#2E7D32] font-medium transition-colors duration-200"
-                >
-                  Clear all
-                </button>
-              </div>
-            )}
-          </section>
+                 {/* Tag Filters */}
+                 <section className="mb-8" aria-labelledby="tag-filters-heading">
+                   <h3 id="tag-filters-heading" className="text-base font-semibold text-gray-900 mb-4">
+                     Filter by Tags
+                   </h3>
+                   <div className="space-y-2" role="group" aria-label="Tag filter options">
+                     {availableTags.map((tag) => (
+                       <button
+                         key={tag}
+                         onClick={() => handleTagClick(tag)}
+                         className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#1B5E20] focus:ring-offset-2 ${
+                           selectedTags.includes(tag)
+                             ? 'bg-[#1B5E20] text-white shadow-sm'
+                             : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200 hover:border-gray-300'
+                         }`}
+                         aria-pressed={selectedTags.includes(tag)}
+                         aria-label={`Filter by ${tag} tag`}
+                       >
+                         {tag}
+                       </button>
+                     ))}
+                   </div>
+                   
+                   {/* Active Filters */}
+                   {selectedTags.length > 0 && (
+                     <div className="mt-4">
+                       <div className="flex items-center justify-between mb-2">
+                         <span className="text-sm text-gray-600">Active filters:</span>
+                         <button
+                           onClick={() => setSelectedTags([])}
+                           className="text-sm text-[#1B5E20] hover:text-[#2E7D32] font-medium transition-colors duration-200"
+                         >
+                           Clear all
+                         </button>
+                       </div>
+                       <div className="space-y-2">
+                         {selectedTags.map((tag) => (
+                           <span
+                             key={tag}
+                             className="inline-flex items-center px-3 py-1 bg-[#E8F5E8] text-[#1B5E20] text-xs font-medium rounded-full"
+                           >
+                             {tag}
+                             <button
+                               onClick={() => handleTagClick(tag)}
+                               className="ml-2 w-4 h-4 rounded-full hover:bg-[#1B5E20] hover:text-white transition-colors duration-200 flex items-center justify-center"
+                               aria-label={`Remove ${tag} filter`}
+                             >
+                               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                               </svg>
+                             </button>
+                           </span>
+                         ))}
+                       </div>
+                     </div>
+                   )}
+                 </section>
 
-          {/* Results Count */}
-          <div className="mb-6 sm:mb-8">
-            <p className="text-sm text-gray-600">
-              Showing {filteredArticles.length} article{filteredArticles.length !== 1 ? 's' : ''}
-              {selectedCategory !== 'All Categories' && ` in ${selectedCategory}`}
-              {selectedTags.length > 0 && ` with tags: ${selectedTags.join(', ')}`}
-            </p>
-          </div>
+                 {/* Results Count */}
+                 <div className="border-t border-gray-200 pt-4">
+                   <p className="text-sm text-gray-600">
+                     Showing {filteredArticles.length} article{filteredArticles.length !== 1 ? 's' : ''}
+                     {selectedCategory !== 'All Categories' && ` in ${selectedCategory}`}
+                     {selectedTags.length > 0 && ` with tags: ${selectedTags.join(', ')}`}
+                   </p>
+                 </div>
+               </div>
+             </div>
 
-          {/* Articles Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+             {/* Main Content Area */}
+             <div className="flex-1">
+               {/* Articles Grid */}
+               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
             {filteredArticles.map((article) => (
               <article 
                 key={article.id} 
@@ -298,13 +313,7 @@ function LearningCentre() {
 
                   {/* Article Title */}
                   <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 line-clamp-2">
-                    <Link 
-                      to={`/learning-centre/${article.slug || article.id}`}
-                      className="hover:text-[#1B5E20] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#1B5E20] focus:ring-offset-1 rounded"
-                      aria-label={`Read article: ${article.title}`}
-                    >
-                      {article.title}
-                    </Link>
+                    {article.title}
                   </h3>
 
                   {/* Article Excerpt */}
@@ -343,19 +352,7 @@ function LearningCentre() {
                     </span>
                   </div>
 
-                  {/* Read More Button */}
-                  <div className="mt-4 sm:mt-6">
-                    <Link 
-                      to={`/learning-centre/${article.slug || article.id}`}
-                      className="inline-flex items-center text-[#1B5E20] font-medium hover:text-[#2E7D32] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#1B5E20] focus:ring-offset-1 rounded"
-                      aria-label={`Read full article: ${article.title}`}
-                    >
-                      Read More
-                      <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
-                  </div>
+
                 </div>
               </article>
             ))}
@@ -393,7 +390,9 @@ function LearningCentre() {
             </div>
           )}
         </div>
-      </section>
+      </div>
+    </div>
+  </section>
 
       {/* Newsletter Signup */}
       <section className="bg-white py-8 sm:py-12 border-t border-gray-200" aria-labelledby="newsletter-heading">

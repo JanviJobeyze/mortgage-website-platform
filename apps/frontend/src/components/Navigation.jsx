@@ -223,6 +223,12 @@ function Navigation() {
                 {t('header.learningCentre')}
               </Link>
               <Link 
+                to="/first-time-home-buyer" 
+                className="text-gray-700 hover:text-green-600 px-2 py-2 text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:rounded"
+              >
+                First-Time Home Buyer
+              </Link>
+              <Link 
                 to="/contact" 
                 className="text-gray-700 hover:text-green-600 px-2 py-2 text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:rounded"
               >
@@ -386,6 +392,13 @@ function Navigation() {
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {t('header.learningCentre')}
+                </Link>
+                <Link 
+                  to="/first-time-home-buyer" 
+                  className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-white rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  First-Time Home Buyer
                 </Link>
                 <Link 
                   to="/contact" 
