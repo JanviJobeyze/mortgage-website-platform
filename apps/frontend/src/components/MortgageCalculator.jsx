@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { formatCurrency } from '../utils/mortgageCalculations.js';
 import tooltipIcon from '../assets/ToolTip.png';
 
-// CMHC insurance rates
+// CMHC insurance rates (percent)
 const getCMHCRate = (downPaymentPercent) => {
-  if (downPaymentPercent >= 20) return 0;
-  if (downPaymentPercent >= 15) return 2.4;
-  if (downPaymentPercent >= 10) return 2.8;
-  if (downPaymentPercent >= 5) return 4.0;
+  if (downPaymentPercent >= 20) return 0.0;   // 20%+ → no premium
+  if (downPaymentPercent >= 15) return 2.8;   // 15–19.99%
+  if (downPaymentPercent >= 10) return 3.1;   // 10–14.99%
+  if (downPaymentPercent >= 5)  return 4.0;   // 5–9.99%
   return 4.0;
 };
 
@@ -77,43 +77,122 @@ const Tooltip = ({ children, content, position = "top" }) => {
 };
 
 function MortgageCalculator({ isCompact = false }) {
+  // Input form state
   const [inputValues, setInputValues] = useState({
-    homePrice: '500,000',
+    homePrice: '500000',
     interestRate: '3.84',
     amortizationPeriod: '25',
     paymentFrequency: 'monthly'
   });
 
-  const [formData, setFormData] = useState({
-    homePrice: 500000,
-    interestRate: 3.84,
-    amortizationPeriod: 25,
-    paymentFrequency: 'monthly'
-  });
+  // Calculated results state
+  const [results, setResults] = useState(null);
+  const [isCalculating, setIsCalculating] = useState(false);
+  const [hasCalculated, setHasCalculated] = useState(false);
 
-  // Update form data when input values change
-  useEffect(() => {
-    const newFormData = {
-      homePrice: parseInt(inputValues.homePrice.replace(/[,]/g, '')) || 0,
+  // Parse input values to numbers
+  const parseInputs = () => {
+    return {
+      homePrice: parseInt(inputValues.homePrice.replace(/[$,]/g, '')) || 0,
       interestRate: parseFloat(inputValues.interestRate.replace(/[%]/g, '')) || 0,
       amortizationPeriod: parseInt(inputValues.amortizationPeriod) || 25,
       paymentFrequency: inputValues.paymentFrequency
     };
-    setFormData(newFormData);
-  }, [inputValues]);
+  };
 
+  // Calculate mortgage payments
+  const calculateMortgage = (formData) => {
+    const { homePrice, interestRate, amortizationPeriod, paymentFrequency } = formData;
+    
+    if (homePrice <= 0 || interestRate <= 0) {
+      return null;
+    }
+
+    const results = [];
+    
+    // Calculate for different down payment percentages
+    [5, 10, 15, 20].forEach(percent => {
+      const downPayment = (homePrice * percent) / 100;
+      const loanAmount = homePrice - downPayment;
+      const cmhcRate = getCMHCRate(percent);
+      const cmhcAmount = cmhcRate > 0 ? Math.round(loanAmount * (cmhcRate / 100)) : 0;
+      const totalMortgage = loanAmount + cmhcAmount;
+      
+      // Calculate monthly payment
+      const monthlyRate = interestRate / 100 / 12;
+      const totalPayments = amortizationPeriod * 12;
+      
+      let monthlyPayment = 0;
+      if (totalMortgage > 0 && interestRate > 0 && amortizationPeriod > 0) {
+        monthlyPayment = totalMortgage * 
+          (monthlyRate * Math.pow(1 + monthlyRate, totalPayments)) / 
+          (Math.pow(1 + monthlyRate, totalPayments) - 1);
+      }
+      
+      // Calculate frequency-adjusted payment
+      let frequencyPayment = monthlyPayment;
+      if (paymentFrequency === 'biweekly') {
+        frequencyPayment = monthlyPayment / 2;
+      } else if (paymentFrequency === 'weekly') {
+        frequencyPayment = monthlyPayment / 4;
+      } else if (paymentFrequency === 'accelerated') {
+        frequencyPayment = (monthlyPayment * 12) / 26;
+      } else if (paymentFrequency === 'accelerated-weekly') {
+        frequencyPayment = (monthlyPayment * 12) / 52;
+      }
+
+      results.push({
+        downPaymentPercent: percent,
+        downPayment,
+        loanAmount,
+        cmhcRate,
+        cmhcAmount,
+        totalMortgage,
+        monthlyPayment,
+        frequencyPayment
+      });
+    });
+
+    return results;
+  };
+
+  // Handle calculate button click
+  const handleCalculate = () => {
+    setIsCalculating(true);
+    
+    // Simulate calculation time for better UX
+    setTimeout(() => {
+      const formData = parseInputs();
+      const calculatedResults = calculateMortgage(formData);
+      
+      setResults({
+        formData,
+        calculations: calculatedResults
+      });
+      setHasCalculated(true);
+      setIsCalculating(false);
+    }, 500);
+  };
+
+  // Handle input changes
   const handleInputChange = (field, value) => {
     setInputValues(prev => ({
       ...prev,
       [field]: value
     }));
+    // Reset results when inputs change
+    if (hasCalculated) {
+      setResults(null);
+      setHasCalculated(false);
+    }
   };
 
+  // Handle input blur (formatting)
   const handleInputBlur = (field) => {
     let rawValue = inputValues[field];
     
     if (field === 'homePrice') {
-      rawValue = rawValue.replace(/[,]/g, '');
+      rawValue = rawValue.replace(/[$,]/g, '');
       const numValue = parseInt(rawValue) || 0;
       const formattedValue = formatCurrency(numValue);
       setInputValues(prev => ({
@@ -130,11 +209,12 @@ function MortgageCalculator({ isCompact = false }) {
     }
   };
 
+  // Handle input focus (remove formatting)
   const handleInputFocus = (field) => {
     let rawValue = inputValues[field];
     
     if (field === 'homePrice') {
-      rawValue = rawValue.replace(/[,]/g, '');
+      rawValue = rawValue.replace(/[$,]/g, '');
       setInputValues(prev => ({
         ...prev,
         [field]: rawValue
@@ -148,6 +228,17 @@ function MortgageCalculator({ isCompact = false }) {
     }
   };
 
+  // Get frequency label
+  const getFrequencyLabel = (frequency) => {
+    switch (frequency) {
+      case 'biweekly': return '/bi-week';
+      case 'weekly': return '/week';
+      case 'accelerated': return '/bi-week*';
+      case 'accelerated-weekly': return '/week*';
+      default: return '/month';
+    }
+  };
+
   return (
     <div className={`bg-white rounded-lg shadow-lg p-4 sm:p-6 border border-gray-200 ${isCompact ? 'max-w-2xl mx-auto' : ''}`}>
       <h2 className="text-xl sm:text-2xl font-semibold text-[#1B5E20] mb-3 sm:mb-4">
@@ -157,9 +248,12 @@ function MortgageCalculator({ isCompact = false }) {
         {isCompact ? 'Calculate your mortgage payments quickly.' : 'Calculate your mortgage payments and explore different scenarios with our comprehensive calculator.'}
       </p>
       
-      {/* Start Here Section */}
-      <div className="mb-8">
-        <div>
+      {/* Input Form Section */}
+      <div className="bg-gray-50 rounded-lg p-4 sm:p-6 mb-6">
+        <h3 className="text-lg font-semibold text-[#1B5E20] mb-4">Enter Your Details</h3>
+        
+        {/* Start Here Section */}
+        <div className="mb-6">
           {/* Start Here - Price Input */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-[#1B5E20] mb-2">
@@ -204,12 +298,6 @@ function MortgageCalculator({ isCompact = false }) {
                 />
                 <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>
               </div>
-              <p className="text-xs text-gray-500 mt-1">
-                Current rate: {formData.interestRate}% • Changes will update all calculations
-                {formData.interestRate !== parseFloat(inputValues.interestRate.replace(/[%]/g, '') || 0) && (
-                  <span className="ml-2 text-[#2E7D32] animate-pulse">🔄 Updating...</span>
-                )}
-              </p>
             </div>
 
             {/* Amortization Period Input */}
@@ -221,7 +309,7 @@ function MortgageCalculator({ isCompact = false }) {
                 </Tooltip>
               </label>
               <select
-                value={formData.amortizationPeriod}
+                value={inputValues.amortizationPeriod}
                 onChange={(e) => handleInputChange('amortizationPeriod', e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent text-sm sm:text-base"
               >
@@ -240,7 +328,7 @@ function MortgageCalculator({ isCompact = false }) {
                 </Tooltip>
               </label>
               <select
-                value={formData.paymentFrequency}
+                value={inputValues.paymentFrequency}
                 onChange={(e) => handleInputChange('paymentFrequency', e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent"
               >
@@ -253,165 +341,198 @@ function MortgageCalculator({ isCompact = false }) {
             </div>
           </div>
         </div>
+
+        {/* Calculate Button */}
+        <div className="text-center">
+          <button
+            onClick={handleCalculate}
+            disabled={isCalculating || parseInputs().homePrice <= 0 || parseInputs().interestRate <= 0}
+            className={`px-8 py-4 text-lg font-semibold text-white rounded-lg transition-all duration-300 transform hover:scale-105 ${
+              isCalculating || parseInputs().homePrice <= 0 || parseInputs().interestRate <= 0
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-[#2E7D32] hover:bg-[#1B5E20] shadow-lg hover:shadow-xl'
+            }`}
+          >
+            {isCalculating ? (
+              <div className="flex items-center justify-center space-x-2">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                <span>Calculating...</span>
+              </div>
+            ) : (
+              'Calculate Mortgage Payments'
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Results Section */}
-      {formData.homePrice > 0 && formData.interestRate > 0 && (
+      {results && results.calculations && (
         <div className="bg-gray-50 rounded-lg p-4 sm:p-6">
-          <h3 className="text-lg font-semibold text-[#1B5E20] mb-4">Payment Breakdown</h3>
+          <h3 className="text-xl font-semibold text-[#1B5E20] mb-6">Payment Breakdown</h3>
           
-          {/* Down Payment Options */}
-          <div className="mb-6">
-            <div className="grid grid-cols-5 gap-4 mb-3">
-              <div className="text-center text-xs sm:text-sm font-semibold text-[#1B5E20]">
-                Down Payment
-              </div>
-              {[5, 10, 15, 20].map((percent) => (
-                <div key={`down-${percent}`} className="text-center">
-                  <div className="text-xs sm:text-sm font-semibold text-[#2E7D32]">
-                    {percent}%
-                  </div>
-                  <div className="text-xs text-gray-600">
-                    ${((formData.homePrice * percent) / 100).toLocaleString()}
-                  </div>
-                </div>
-              ))}
+          {/* Interest Rate and Amortization Info */}
+          <div className="text-center mb-6">
+            <div className="text-sm text-[#2E7D32] bg-green-100 px-4 py-2 rounded-full inline-block">
+              Based on {results.formData.interestRate}% interest rate • {results.formData.amortizationPeriod} year amortization
             </div>
-
-            {/* Loan Amount Row */}
-            <div className="grid grid-cols-5 gap-4 mb-3">
-              <div className="text-center text-xs sm:text-sm font-semibold text-[#1B5E20]">
-                Loan Amount
-              </div>
-              {[5, 10, 15, 20].map((percent) => {
-                const downPayment = (formData.homePrice * percent) / 100;
-                const loanAmount = formData.homePrice - downPayment;
-                return (
-                  <div key={`loan-${percent}`} className="text-center">
-                    <div className="text-xs sm:text-sm font-semibold text-[#2E7D32]">
-                      ${loanAmount.toLocaleString()}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* CMHC Insurance Row */}
-            <div className="grid grid-cols-5 gap-4 mb-3">
-              <div className="text-center text-xs sm:text-sm font-semibold text-[#1B5E20]">
-                CMHC Insurance
-              </div>
-              {[5, 10, 15, 20].map((percent) => {
-                const downPayment = (formData.homePrice * percent) / 100;
-                const loanAmount = formData.homePrice - downPayment;
-                const cmhcRate = getCMHCRate(percent);
-                const cmhcAmount = cmhcRate > 0 ? Math.round(loanAmount * (cmhcRate / 100)) : 0;
-                return (
-                  <div key={`cmhc-${percent}`} className="text-center">
-                    <div className="text-xs sm:text-sm font-semibold text-[#2E7D32]">
-                      ${cmhcAmount.toLocaleString()}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Total Mortgage Row */}
-            <div className="grid grid-cols-5 gap-4 mb-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-              <div className="text-center text-xs sm:text-sm font-semibold text-[#1B5E20]">
-                Total Mortgage
-              </div>
-              {[5, 10, 15, 20].map((percent) => {
-                const downPayment = (formData.homePrice * percent) / 100;
-                const loanAmount = formData.homePrice - downPayment;
-                const cmhcRate = getCMHCRate(percent);
-                const cmhcAmount = cmhcRate > 0 ? Math.round(loanAmount * (cmhcRate / 100)) : 0;
-                const totalMortgage = loanAmount + cmhcAmount;
-                return (
-                  <div key={`total-${percent}`} className="text-center">
-                    <div className="text-lg sm:text-xl font-bold text-[#1B5E20]">
-                      ${totalMortgage.toLocaleString()}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Interest Rate Indicator */}
-            <div className="text-center mb-4">
-              <div className="text-xs text-[#2E7D32] bg-green-100 px-3 py-1 rounded-full inline-block">
-                Based on {formData.interestRate}% interest rate • {formData.amortizationPeriod} year amortization
-              </div>
-            </div>
-            
-            {/* Mortgage Payment Row */}
-            <div className="grid grid-cols-5 gap-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-              <div className="text-center text-xs sm:text-sm font-semibold text-[#1B5E20]">
-                Payment
-              </div>
-              {[5, 10, 15, 20].map((percent) => {
-                const downPayment = (formData.homePrice * percent) / 100;
-                const loanAmount = formData.homePrice - downPayment;
-                const cmhcRate = getCMHCRate(percent);
-                const cmhcAmount = cmhcRate > 0 ? Math.round(loanAmount * (cmhcRate / 100)) : 0;
-                const totalMortgage = loanAmount + cmhcAmount;
-                
-                // Calculate monthly payment
-                const monthlyRate = formData.interestRate / 100 / 12;
-                const totalPayments = formData.amortizationPeriod * 12;
-                
-                let monthlyPayment = 0;
-                if (totalMortgage > 0 && formData.interestRate > 0 && formData.amortizationPeriod > 0) {
-                  monthlyPayment = totalMortgage * 
-                    (monthlyRate * Math.pow(1 + monthlyRate, totalPayments)) / 
-                    (Math.pow(1 + monthlyRate, totalPayments) - 1);
-                }
-                
-                // Calculate frequency-adjusted payment
-                let frequencyPayment = monthlyPayment;
-                if (formData.paymentFrequency === 'biweekly') {
-                  frequencyPayment = monthlyPayment / 2;
-                } else if (formData.paymentFrequency === 'weekly') {
-                  frequencyPayment = monthlyPayment / 4;
-                } else if (formData.paymentFrequency === 'accelerated') {
-                  frequencyPayment = (monthlyPayment * 12) / 26;
-                } else if (formData.paymentFrequency === 'accelerated-weekly') {
-                  frequencyPayment = (monthlyPayment * 12) / 52;
-                }
-
-                // Get frequency label
-                const getFrequencyLabel = () => {
-                  switch (formData.paymentFrequency) {
-                    case 'biweekly': return '/bi-week';
-                    case 'weekly': return '/week';
-                    case 'accelerated': return '/bi-week*';
-                    case 'accelerated-weekly': return '/week*';
-                    default: return '/month';
-                  }
-                };
-
-                return (
-                  <div key={`payment-${percent}`} className="text-center">
-                    <div className="text-lg sm:text-xl font-bold text-[#1B5E20]">
-                      ${frequencyPayment.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                    </div>
-                    <div className="text-xs text-gray-600">
-                      {getFrequencyLabel()}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Accelerated Payment Note */}
-            {(formData.paymentFrequency === 'accelerated' || formData.paymentFrequency === 'accelerated-weekly') && (
-              <div className="text-center mt-2">
-                <p className="text-xs text-gray-600">
-                  *Accelerated payments reduce total interest and amortization period
-                </p>
-              </div>
-            )}
           </div>
+
+          {/* Responsive Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse bg-white rounded-lg shadow-sm">
+              {/* Table Header */}
+              <thead className="bg-[#1B5E20] text-white">
+                <tr>
+                  <th className="px-4 py-3 text-left font-semibold text-sm sm:text-base border-b border-gray-200">
+                    Details
+                  </th>
+                  <th className="px-4 py-3 text-center font-semibold text-sm sm:text-base border-b border-gray-200">
+                    5% Down
+                  </th>
+                  <th className="px-4 py-3 text-center font-semibold text-sm sm:text-base border-b border-gray-200">
+                    10% Down
+                  </th>
+                  <th className="px-4 py-3 text-center font-semibold text-sm sm:text-base border-b border-gray-200">
+                    15% Down
+                  </th>
+                  <th className="px-4 py-3 text-center font-semibold text-sm sm:text-base border-b border-gray-200">
+                    20% Down
+                  </th>
+                </tr>
+              </thead>
+              
+              {/* Table Body */}
+              <tbody>
+                {/* Down Payment Row */}
+                <tr className="border-b border-gray-100">
+                  <td className="px-4 py-3 font-medium text-gray-900 text-sm sm:text-base">
+                    Down Payment
+                  </td>
+                  {results.calculations.map((calc) => (
+                    <td key={`down-${calc.downPaymentPercent}`} className="px-4 py-3 text-center">
+                      <div className="font-semibold text-[#2E7D32] text-sm sm:text-base">
+                        {calc.downPaymentPercent}%
+                      </div>
+                      <div className="text-gray-600 text-sm">
+                        {formatCurrency(calc.downPayment)}
+                      </div>
+                    </td>
+                  ))}
+                </tr>
+
+                {/* Base Loan Row */}
+                <tr className="border-b border-gray-100 bg-gray-50">
+                  <td className="px-4 py-3 font-medium text-gray-900 text-sm sm:text-base">
+                    Base Loan
+                  </td>
+                  {results.calculations.map((calc) => (
+                    <td key={`loan-${calc.downPaymentPercent}`} className="px-4 py-3 text-center">
+                      <div className="font-semibold text-[#2E7D32] text-sm sm:text-base">
+                        {formatCurrency(calc.loanAmount)}
+                      </div>
+                    </td>
+                  ))}
+                </tr>
+
+                {/* CMHC Rate Row */}
+                <tr className="border-b border-gray-100">
+                  <td className="px-4 py-3 font-medium text-gray-900 text-sm sm:text-base">
+                    CMHC Rate
+                  </td>
+                  {results.calculations.map((calc) => (
+                    <td key={`cmhc-rate-${calc.downPaymentPercent}`} className="px-4 py-3 text-center">
+                      <div className="font-semibold text-[#2E7D32] text-sm sm:text-base">
+                        {calc.cmhcRate > 0 ? `${calc.cmhcRate}%` : 'N/A'}
+                      </div>
+                    </td>
+                  ))}
+                </tr>
+
+                {/* CMHC Premium Row */}
+                <tr className="border-b border-gray-100 bg-gray-50">
+                  <td className="px-4 py-3 font-medium text-gray-900 text-sm sm:text-base">
+                    CMHC Premium
+                  </td>
+                  {results.calculations.map((calc) => (
+                    <td key={`cmhc-${calc.downPaymentPercent}`} className="px-4 py-3 text-center">
+                      <div className="font-semibold text-[#2E7D32] text-sm sm:text-base">
+                        {formatCurrency(calc.cmhcAmount)}
+                      </div>
+                    </td>
+                  ))}
+                </tr>
+
+                {/* Total Mortgage Row */}
+                <tr className="border-b-2 border-[#1B5E20] bg-green-50">
+                  <td className="px-4 py-4 font-bold text-[#1B5E20] text-sm sm:text-base">
+                    Total Mortgage (Loan + CMHC)
+                  </td>
+                  {results.calculations.map((calc) => (
+                    <td key={`total-${calc.downPaymentPercent}`} className="px-4 py-4 text-center">
+                      <div className="font-bold text-[#1B5E20] text-lg sm:text-xl">
+                        {formatCurrency(calc.totalMortgage)}
+                      </div>
+                    </td>
+                  ))}
+                </tr>
+
+                {/* Payment Row */}
+                <tr className="bg-green-100 border-b-2 border-[#1B5E20]">
+                  <td className="px-4 py-4 font-bold text-[#1B5E20] text-sm sm:text-base">
+                    Payment {getFrequencyLabel(results.formData.paymentFrequency)}
+                  </td>
+                  {results.calculations.map((calc) => (
+                    <td key={`payment-${calc.downPaymentPercent}`} className="px-4 py-4 text-center">
+                      <div className="font-bold text-[#1B5E20] text-lg sm:text-xl">
+                        {formatCurrency(calc.frequencyPayment)}
+                      </div>
+                    </td>
+                  ))}
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {/* Accelerated Payment Note */}
+          {(results.formData.paymentFrequency === 'accelerated' || results.formData.paymentFrequency === 'accelerated-weekly') && (
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-800 text-center">
+                <strong>Note:</strong> Accelerated payments reduce total interest and amortization period
+              </p>
+            </div>
+          )}
+
+          {/* Additional Information */}
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white p-4 rounded-lg border border-gray-200">
+              <h4 className="font-semibold text-[#1B5E20] mb-2 text-sm sm:text-base">CMHC Insurance Tiers</h4>
+              <ul className="text-sm text-gray-700 space-y-1">
+                <li>• 5-9.99% down: 4.00% premium</li>
+                <li>• 10-14.99% down: 3.10% premium</li>
+                <li>• 15-19.99% down: 2.80% premium</li>
+                <li>• 20%+ down: No insurance required</li>
+              </ul>
+            </div>
+            <div className="bg-white p-4 rounded-lg border border-gray-200">
+              <h4 className="font-semibold text-[#1B5E20] mb-2 text-sm sm:text-base">Payment Frequency</h4>
+              <p className="text-sm text-gray-700">
+                {results.formData.paymentFrequency === 'monthly' && 'Monthly payments are the standard option.'}
+                {results.formData.paymentFrequency === 'biweekly' && 'Bi-weekly payments (26 payments per year).'}
+                {results.formData.paymentFrequency === 'weekly' && 'Weekly payments (52 payments per year).'}
+                {results.formData.paymentFrequency === 'accelerated' && 'Accelerated bi-weekly payments reduce total interest.'}
+                {results.formData.paymentFrequency === 'accelerated-weekly' && 'Accelerated weekly payments reduce total interest.'}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* No Results Message */}
+      {!results && hasCalculated && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
+          <p className="text-yellow-800">
+            Please enter valid values for home price and interest rate to calculate mortgage payments.
+          </p>
         </div>
       )}
     </div>

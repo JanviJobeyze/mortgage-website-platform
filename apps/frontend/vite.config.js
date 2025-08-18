@@ -7,11 +7,15 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   build: {
     rollupOptions: {
-      // Disable optional dependencies to avoid rollup issues
-      external: [],
+      // Handle platform-specific dependencies
+      external: [
+        '@rollup/rollup-linux-x64-gnu',
+        '@rollup/rollup-darwin-x64',
+        '@rollup/rollup-win32-x64-msvc'
+      ],
     },
-    // Use esbuild for faster builds
-    minify: 'esbuild',
+    // Use terser instead of esbuild for better compatibility
+    minify: 'terser',
     sourcemap: false,
   },
   // Optimize dependencies

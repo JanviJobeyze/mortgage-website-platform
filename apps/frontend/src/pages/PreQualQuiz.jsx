@@ -181,7 +181,7 @@ function PreQualQuiz() {
     setSubmitMessage('');
     
     try {
-      const response = await fetch('http://localhost:5000/api/lead', {
+              const response = await fetch('/api/lead', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

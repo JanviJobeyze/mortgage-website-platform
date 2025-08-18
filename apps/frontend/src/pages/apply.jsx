@@ -356,7 +356,7 @@ function Apply() {
         }
       });
       
-      const response = await fetch('http://localhost:5000/api/apply', {
+              const response = await fetch('/api/apply', {
         method: 'POST',
         body: formDataToSend
       });

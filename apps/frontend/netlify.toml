@@ -10,7 +10,7 @@
 
 [build.environment]
   # Node version
-  NODE_VERSION = "18"
+  NODE_VERSION = "20"
   # Fix for rollup optional dependencies
   NPM_FLAGS = "--legacy-peer-deps"
   # Force npm to install optional dependencies

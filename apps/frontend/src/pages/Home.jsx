@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import StarIcon from '../assets/Star.png';
@@ -17,6 +17,7 @@ import ChatBot from '../components/ChatBot';
 import { ResultCard } from '../components';
 import { loadProvinceRates } from '../utils/rateApiService';
 import MortgageCalculator from '../components/MortgageCalculator';
+import BannerVideo from '../assets/banner_video.mp4';
 
 
 function Home() {
@@ -24,6 +25,9 @@ function Home() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const videoRef = useRef(null);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
 
   // Calculator functionality now handled by MortgageCalculator component
 
@@ -109,6 +113,26 @@ function Home() {
 
   // Calculator functionality now handled by MortgageCalculator component
 
+  // Video controls
+  const togglePlayPause = () => {
+    const el = videoRef.current;
+    if (!el) return;
+    if (el.paused) {
+      el.play();
+      setIsVideoPlaying(true);
+    } else {
+      el.pause();
+      setIsVideoPlaying(false);
+    }
+  };
+
+  const toggleMute = () => {
+    const el = videoRef.current;
+    if (!el) return;
+    el.muted = !el.muted;
+    setIsMuted(el.muted);
+  };
+
 
 
 
@@ -116,12 +140,12 @@ function Home() {
     <div className="min-h-screen">
       <main id="main">
         {/* Hero Section */}
-        <section className="bg-[#C8E6C9] py-8 sm:py-12 md:py-16 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-center">
-            {/* Left Content */}
-            <div className="space-y-4 md:space-y-6 text-left md:text-center lg:text-left">
-              <div className="bg-[#FFE0B2] text-[#E65100] px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium inline-flex items-center w-fit mx-auto md:mx-auto lg:mx-0">
+                <section className="bg-[#C8E6C9] py-6 sm:py-8 px-4">
+        <div className="max-w-[1400px] mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 items-center">
+              {/* Left Content + Mini Quiz */}
+              <div className="space-y-3 md:space-y-4 text-left md:text-center lg:text-left">
+                <div className="bg-[#FFE0B2] text-[#E65100] px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium inline-flex items-center w-fit mx-auto md:mx-auto lg:mx-0">
                 <img src={StarIcon} alt="Star" className="w-3 h-3 sm:w-4 sm:h-4 mr-2" loading="lazy" />
                 <span className="whitespace-nowrap">{t('home.hero.trustedBadge')}</span>
               </div>
@@ -142,14 +166,14 @@ function Home() {
                   <div className="text-left py-2">
                     <div className="text-xs text-[#9CA3AF] mb-1 sm:mb-2">{t('home.hero.currentBestRate')}</div>
                     <div className="text-xl sm:text-2xl font-bold text-[#1B5E20] mb-1">
-                      {ratesLoading ? '...' : topRates.length > 0 ? `${topRates[0]?.rate}%` : '2.89%'}
+                      {ratesLoading ? '...' : topRates.length > 0 ? `${topRates.find(r => r.type === 'Fixed')?.rate}%` : '2.89%'}
                     </div>
                     <div className="text-xs text-[#9CA3AF]">{t('home.hero.fiveYearFixed')}</div>
                   </div>
                   <div className="text-right py-2">
                     <div className="text-xs text-[#9CA3AF] mb-1 sm:mb-2">{t('home.hero.variableRate')}</div>
                     <div className="text-xl sm:text-2xl font-bold text-[#1B5E20] mb-1">
-                      {ratesLoading ? '...' : topRates.length > 1 ? `${topRates[1]?.rate}%` : '3.15%'}
+                      {ratesLoading ? '...' : topRates.length > 0 ? `${topRates.find(r => r.type === 'Variable')?.rate}%` : '3.15%'}
                     </div>
                     <div className="text-xs text-[#9CA3AF]">{t('home.hero.primePlus')}</div>
                   </div>
@@ -184,14 +208,263 @@ function Home() {
                   <span>View All Rates</span>
                 </button>
               </div>
+
+              {/* Quick link to Eligibility Quiz is provided by the CTA above */}
                         </div>
             
-            {/* Quick Payment Calculator */}
-            <MortgageCalculator isCompact={true} />
+            {/* Right: Hero Video */}
+            <div className="w-full lg:h-[380px] xl:h-[420px]">
+              <div className="group relative rounded-2xl overflow-hidden shadow-2xl border border-white/40 ring-1 ring-black/5 h-full">
+                <video
+                  ref={videoRef}
+                  src={BannerVideo}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                  autoPlay
+                  muted={isMuted}
+                  loop
+                  playsInline
+                  onPlay={() => setIsVideoPlaying(true)}
+                  onPause={() => setIsVideoPlaying(false)}
+                  poster="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
+                />
+
+                {/* Gradient overlays */}
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
+                <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-tr from-emerald-500/10 to-transparent"></div>
+
+                {/* Top-left label */}
+                <div className="absolute top-3 left-3">
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-white/90 text-[#1B5E20] shadow">
+                    Featured: How Mortgage Approval Works
+                  </span>
+                </div>
+
+                {/* Controls */}
+                <div className="absolute bottom-3 right-3 flex items-center gap-2">
+                  <button
+                    onClick={togglePlayPause}
+                    className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/90 text-[#1B5E20] hover:bg-white transition-colors shadow"
+                    aria-label={isVideoPlaying ? 'Pause video' : 'Play video'}
+                  >
+                    {isVideoPlaying ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                        <path d="M6.75 5.25a.75.75 0 0 1 .75.75v12a.75.75 0 0 1-1.5 0v-12a.75.75 0 0 1 .75-.75zm9 0a.75.75 0 0 1 .75.75v12a.75.75 0 0 1-1.5 0v-12a.75.75 0 0 1 .75-.75z" />
+                      </svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                        <path d="M5.25 4.5v15l13.5-7.5-13.5-7.5z" />
+                      </svg>
+                    )}
+                  </button>
+                  <button
+                    onClick={toggleMute}
+                    className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/90 text-[#1B5E20] hover:bg-white transition-colors shadow"
+                    aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+                  >
+                    {isMuted ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                        <path d="M3 10v4h4l5 5V5L7 10H3zm13.59 2l2.7 2.7 1.41-1.41-2.7-2.7 2.7-2.7L19.29 6.5l-2.7 2.7-2.7-2.7-1.41 1.41 2.7 2.7-2.7 2.7 1.41 1.41 2.7-2.7z" />
+                      </svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                        <path d="M3 10v4h4l5 5V5L7 10H3zm10.5-4.5v2.09c2.89.86 5 3.54 5 6.41s-2.11 5.55-5 6.41v2.09c4.01-.91 7-4.49 7-8.5s-2.99-7.59-7-8.5z" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+              </div>
+              <p className="text-xs text-[#2E7D32] mt-2 text-center lg:text-right">Informational video. Results may vary.</p>
+            </div>
           </div>
         </div>
       </section>
+{/* Current Mortgage Rates Section */}
+<section className="py-12 px-4 bg-[#F8F9FA]">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-8">
+           
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#212121] mb-4">
+              Current Mortgage Rates
+            </h2>
+            <p className="text-[#757575] text-lg max-w-3xl mx-auto leading-relaxed">
+              Stay ahead with real-time rates from Canada's top lenders. Compare and find the perfect mortgage rate for your needs.
+            </p>
+          </div>
 
+          {/* Main Content */}
+          <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8">
+            {/* Loading State */}
+            {ratesLoading && (
+              <div className="text-center py-12">
+                <div className="inline-flex items-center space-x-3">
+                  <div className="relative">
+                    <div className="w-8 h-8 border-4 border-[#1B5E20]/20 border-t-[#1B5E20] rounded-full animate-spin"></div>
+                  </div>
+                  <span className="text-lg text-gray-600">Loading current rates...</span>
+                </div>
+              </div>
+            )}
+
+            {/* Error State */}
+            {ratesError && !ratesLoading && (
+              <div role="alert" className="bg-red-100 text-red-700 p-4 rounded-lg text-center mb-8">
+                <div className="flex items-center justify-center space-x-2">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                  <span className="font-medium">{ratesError}</span>
+                </div>
+              </div>
+            )}
+
+            {/* Best Rate Highlight */}
+            {!ratesLoading && !ratesError && topRates.length > 0 && (
+              <div className="mb-6 p-4 bg-[#F8F9FA] rounded-lg">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div className="text-center sm:text-left">
+                    <div className="inline-flex items-center px-3 py-1 bg-[#1B5E20] text-white rounded-full text-xs font-semibold mb-3">
+                      <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      Best Rate Available
+                    </div>
+                    <div className="space-y-2">
+                      <div className="text-2xl sm:text-3xl font-bold text-[#1B5E20]">
+                        {topRates[0]?.rate}%
+                      </div>
+                      <div className="text-sm sm:text-base text-gray-600">
+                        {typeof topRates[0]?.lender?.name === 'string' ? topRates[0].lender.name : 'Unknown Lender'} • {topRates[0]?.type} • {topRates[0]?.term}
+                      </div>
+                      <div className="text-xs sm:text-sm text-gray-500">
+                        APR: {topRates[0]?.apr}% • Home Purchase
+                      </div>
+                    </div>
+                  </div>
+                  <div className="sm:text-right">
+                    <div className="inline-flex items-center px-4 py-2 bg-white rounded-lg shadow-sm border border-[#1B5E20]/20">
+                      <svg className="w-4 h-4 text-[#1B5E20] mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <span className="text-xs font-medium text-[#1B5E20]">Updated Today</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Rates List - Row style, responsive */}
+            {!ratesLoading && !ratesError && topRates.length > 0 && (
+              <div className="space-y-2.5 mb-4">
+                {topRates.map((rate, index) => (
+                  <div
+                    key={index}
+                    className={`group rounded-lg border p-2.5 sm:p-3 bg-white hover:shadow-md transition ${
+                      index === 0
+                        ? 'border-[#1B5E20] ring-1 ring-[#1B5E20]/20 bg-[#F8F9FA]'
+                        : 'border-gray-200'
+                    }`}
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-10 md:items-center gap-2.5">
+                      {/* Left: Lender */}
+                      <div className="flex items-center min-w-0 gap-3 md:col-span-4">
+                        <div
+                          className={`w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0 ${
+                            rate.lender?.color || 'bg-gray-600'
+                          }`}
+                        >
+                          {typeof rate.lender?.logo === 'string' ? rate.lender.logo : '🏦'}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-semibold text-gray-900 text-xs sm:text-sm truncate">
+                            {typeof rate.lender?.name === 'string' ? rate.lender.name : 'Unknown Lender'}
+                          </div>
+                          <div className="text-[11px] text-gray-500 truncate">
+                            {typeof rate.lender?.type === 'string' ? rate.lender.type : 'Major Bank'}
+                          </div>
+                        </div>
+                        {index === 0 && (
+                          <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full bg-[#1B5E20] text-white text-[10px] font-semibold flex-shrink-0">
+                            Best
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Middle: Rate and tags */}
+                      <div className="md:col-span-4 grid grid-cols-2 gap-2 sm:gap-3 items-center">
+                        <div className="text-center">
+                          <div className="text-lg sm:text-xl font-bold text-[#1B5E20] leading-none">{rate.rate}%</div>
+                          <div className="text-[10px] text-gray-500">
+                            Annual Rate{rate.apr ? ` • APR ${rate.apr}%` : ''}
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-center gap-2">
+                          <span
+                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium ${
+                              rate.type === 'Fixed'
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-blue-100 text-blue-800'
+                            }`}
+                          >
+                            {rate.type}
+                          </span>
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-gray-100 text-gray-700">
+                            {rate.term}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Right: CTAs */}
+                      <div className="md:col-span-2 flex flex-col sm:flex-row items-stretch md:justify-end gap-1.5">
+                        <button
+                          onClick={() => navigate('/apply')}
+                          className="w-full sm:w-auto inline-flex items-center justify-center px-3 py-1.5 rounded-md bg-[#1B5E20] text-white text-xs font-semibold hover:bg-[#2E7D32] transition-colors"
+                        >
+                          Apply Now
+                        </button>
+                        <button
+                          onClick={() => navigate('/eligibility-quiz')}
+                          className="w-full sm:w-auto inline-flex items-center justify-center px-3 py-1.5 rounded-md border border-[#1B5E20] text-[#1B5E20] text-xs font-semibold hover:bg-[#F1F8E9] transition-colors"
+                        >
+                          Check Eligibility
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* No Rates State */}
+            {!ratesLoading && !ratesError && topRates.length === 0 && (
+              <div className="text-center py-8">
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-gray-100 rounded-full mb-3">
+                  <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <p className="text-gray-500 text-sm">No rates available at the moment. Please try again later.</p>
+              </div>
+            )}
+
+            {/* Call to Action */}
+            <div className="text-center">
+              <button 
+                onClick={() => navigate('/rates')}
+                className="inline-flex items-center px-6 py-3 bg-[#1B5E20] hover:bg-[#2E7D32] text-white font-semibold rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#1B5E20] focus:ring-offset-2 shadow-sm hover:shadow-md text-base"
+              >
+                <span>Explore All 20+ Rates</span>
+                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l7 7-7 7" />
+                </svg>
+              </button>
+              <p className="text-xs text-gray-500 mt-3">
+                Compare rates from all provinces and lenders
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
       {/* Comprehensive Mortgage Solutions */}
       <section className="py-8 sm:py-12 md:py-16 px-4 bg-[#FFFFFF]">
         <div className="max-w-7xl mx-auto text-center">
@@ -301,183 +574,40 @@ function Home() {
         </div>
       </section>
       
-      {/* Current Mortgage Rates Section */}
-      <section className="py-16 px-4 bg-[#F8F9FA]">
-        <div className="max-w-7xl mx-auto">
+      {/* Mortgage Calculator Section */}
+      <section className="py-8 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-[#1B5E20] rounded-full mb-6">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-              </svg>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#212121] mb-4">
-              Current Mortgage Rates
+          <div className="text-center mb-6">
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#212121] mb-3">
+              Calculate Your Mortgage
             </h2>
-            <p className="text-[#757575] text-lg max-w-3xl mx-auto leading-relaxed">
-              Stay ahead with real-time rates from Canada's top lenders. Compare and find the perfect mortgage rate for your needs.
+            <p className="text-[#757575] text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+              Get instant mortgage payment estimates and explore different scenarios.
             </p>
           </div>
 
-          {/* Main Content */}
-          <div className="bg-white rounded-2xl shadow-xl p-8 sm:p-12">
-            {/* Loading State */}
-            {ratesLoading && (
-              <div className="text-center py-12">
-                <div className="inline-flex items-center space-x-3">
-                  <div className="relative">
-                    <div className="w-8 h-8 border-4 border-[#1B5E20]/20 border-t-[#1B5E20] rounded-full animate-spin"></div>
-                  </div>
-                  <span className="text-lg text-gray-600">Loading current rates...</span>
-                </div>
-              </div>
-            )}
+          {/* Calculator Component */}
+          <div className="mb-8">
+            <MortgageCalculator isCompact={false} />
+          </div>
 
-            {/* Error State */}
-            {ratesError && !ratesLoading && (
-              <div role="alert" className="bg-red-100 text-red-700 p-4 rounded-lg text-center mb-8">
-                <div className="flex items-center justify-center space-x-2">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                  </svg>
-                  <span className="font-medium">{ratesError}</span>
-                </div>
-              </div>
-            )}
-
-            {/* Best Rate Highlight */}
-            {!ratesLoading && !ratesError && topRates.length > 0 && (
-              <div className="mb-8 p-6 bg-[#F8F9FA] rounded-lg">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                  <div className="text-center sm:text-left">
-                    <div className="inline-flex items-center px-3 py-1 bg-[#1B5E20] text-white rounded-full text-xs font-semibold mb-3">
-                      <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      Best Rate Available
-                    </div>
-                    <div className="space-y-2">
-                      <div className="text-3xl sm:text-4xl font-bold text-[#1B5E20]">
-                        {topRates[0]?.rate}%
-                      </div>
-                      <div className="text-sm sm:text-base text-gray-600">
-                        {typeof topRates[0]?.lender?.name === 'string' ? topRates[0].lender.name : 'Unknown Lender'} • {topRates[0]?.type} • {topRates[0]?.term}
-                      </div>
-                      <div className="text-xs sm:text-sm text-gray-500">
-                        APR: {topRates[0]?.apr}% • Home Purchase
-                      </div>
-                    </div>
-                  </div>
-                  <div className="sm:text-right">
-                    <div className="inline-flex items-center px-4 py-2 bg-white rounded-lg shadow-sm border border-[#1B5E20]/20">
-                      <svg className="w-4 h-4 text-[#1B5E20] mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="text-xs font-medium text-[#1B5E20]">Updated Today</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Rates Cards Row */}
-            {!ratesLoading && !ratesError && topRates.length > 0 && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-                {topRates.map((rate, index) => (
-                  <div key={index} className={`group relative bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 border h-full ${
-                    index === 0 ? 'border-[#1B5E20] bg-[#F8F9FA]' : 'border-gray-200 hover:border-[#1B5E20]/30'
-                  }`}>
-                    {/* Best Rate Badge */}
-                    {index === 0 && (
-                      <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
-                        <div className="bg-[#1B5E20] text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md">
-                          Best Rate
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Lender Info */}
-                    <div className="flex items-center mb-3">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3 flex-shrink-0 ${
-                        rate.lender?.color || 'bg-gray-600'
-                      }`}>
-                        {typeof rate.lender?.logo === 'string' ? rate.lender.logo : '🏦'}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="font-semibold text-gray-900 text-sm truncate">{typeof rate.lender?.name === 'string' ? rate.lender.name : 'Unknown Lender'}</div>
-                        <div className="text-xs text-gray-500 truncate">{typeof rate.lender?.type === 'string' ? rate.lender.type : 'Major Bank'}</div>
-                      </div>
-                    </div>
-
-                    {/* Rate Display */}
-                    <div className="text-center mb-3">
-                      <div className="text-2xl font-bold text-[#1B5E20] mb-1">
-                        {rate.rate}%
-                      </div>
-                      <div className="text-xs text-gray-600">
-                        Annual Rate
-                      </div>
-                    </div>
-
-                    {/* Rate Details */}
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-center space-x-2">
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                          rate.type === 'Fixed' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
-                        }`}>
-                          {rate.type}
-                        </span>
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-                          {rate.term}
-                        </span>
-                      </div>
-                      
-                      {/* Change Indicator */}
-                      {rate.change !== undefined && (
-                        <div className="flex items-center justify-center">
-                          <span className={`text-xs font-medium ${
-                            rate.change > 0 ? 'text-red-600' : rate.change < 0 ? 'text-green-600' : 'text-gray-600'
-                          }`}>
-                            {rate.change > 0 ? '↗' : rate.change < 0 ? '↘' : '→'} {rate.change > 0 ? '+' : ''}{rate.change || 0}%
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* No Rates State */}
-            {!ratesLoading && !ratesError && topRates.length === 0 && (
-              <div className="text-center py-8">
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-gray-100 rounded-full mb-3">
-                  <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
-                <p className="text-gray-500 text-sm">No rates available at the moment. Please try again later.</p>
-              </div>
-            )}
-
-            {/* Call to Action */}
-            <div className="text-center">
-              <button 
-                onClick={() => navigate('/rates')}
-                className="inline-flex items-center px-6 py-3 bg-[#1B5E20] hover:bg-[#2E7D32] text-white font-semibold rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#1B5E20] focus:ring-offset-2 shadow-sm hover:shadow-md text-base"
-              >
-                <span>Explore All 20+ Rates</span>
-                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l7 7-7 7" />
-                </svg>
-              </button>
-              <p className="text-xs text-gray-500 mt-3">
-                Compare rates from all provinces and lenders
-              </p>
-            </div>
+          {/* Explore More Button */}
+          <div className="text-center">
+            <button
+              onClick={() => navigate('/calculator')}
+              className="inline-flex items-center px-5 py-2.5 bg-[#1B5E20] text-white font-semibold rounded-lg hover:bg-[#2E7D32] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#1B5E20] focus:ring-offset-2 shadow-sm hover:shadow-md text-sm"
+            >
+              Explore More Calculators
+              <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l7 7-7 7" />
+              </svg>
+            </button>
           </div>
         </div>
       </section>
+
+      
 
      
 

@@ -274,7 +274,7 @@ function EligibilityQuiz() {
               </svg>
             </div>
             <h2 className="text-3xl font-bold text-[#1B5E20] mb-4">
-              Great News! You're Eligible for Our Programs! 🎉
+              Great News! You May Eligible for Loan!
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Based on your profile, you qualify for our specialized mortgage solutions and personalized improvement programs. We have multiple pathways to help you achieve your homeownership goals!
@@ -312,8 +312,8 @@ function EligibilityQuiz() {
             </div>
           </div>
 
-          <div className="bg-[#E8F5E8] rounded-lg p-6 max-w-lg mx-auto">
-            <h3 className="text-lg font-semibold text-[#1B5E20] mb-4">
+          <div className="bg-[#E8F5E8] rounded-lg p-6 max-w-4xl mx-auto">
+            <h3 className="text-xl font-semibold text-[#1B5E20] mb-6">
               Claim Your Personalized Mortgage Solution:
             </h3>
             <div className="space-y-4">
@@ -370,15 +370,15 @@ function EligibilityQuiz() {
 
   // Render contact form
   const renderContactForm = () => (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+    <div className="space-y-8 w-full mx-auto p-8 bg-white rounded-lg shadow-lg">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
           <input
             type="text"
             placeholder="First Name *"
             value={formData.firstName}
             onChange={(e) => handleInputChange('firstName', e.target.value)}
-            className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-[#2E7D32] ${
+            className={`w-full px-4 py-4 text-lg border rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-[#2E7D32] ${
               errors.firstName ? 'border-red-500' : 'border-gray-300'
             }`}
             required
@@ -391,7 +391,7 @@ function EligibilityQuiz() {
             placeholder="Last Name (Optional)"
             value={formData.lastName}
             onChange={(e) => handleInputChange('lastName', e.target.value)}
-            className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-[#2E7D32] ${
+            className={`w-full px-4 py-4 text-lg border rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-[#2E7D32] ${
               errors.lastName ? 'border-red-500' : 'border-gray-300'
             }`}
           />
@@ -405,7 +405,7 @@ function EligibilityQuiz() {
           placeholder="Phone Number *"
           value={formData.phone}
           onChange={(e) => handleInputChange('phone', e.target.value)}
-          className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-[#2E7D32] ${
+          className={`w-full px-4 py-4 text-lg border rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-[#2E7D32] ${
             errors.phone ? 'border-red-500' : 'border-gray-300'
           }`}
           required
@@ -416,12 +416,13 @@ function EligibilityQuiz() {
       <div>
         <input
           type="email"
-          placeholder="Email Address (Optional)"
+          placeholder="Email Address *"
           value={formData.email}
           onChange={(e) => handleInputChange('email', e.target.value)}
-          className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-[#2E7D32] ${
+          className={`w-full px-4 py-4 text-lg border rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-[#2E7D32] ${
             errors.email ? 'border-red-500' : 'border-gray-300'
           }`}
+          required
         />
         {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
       </div>

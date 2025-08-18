@@ -174,8 +174,8 @@ const RatesTable = ({ data: propData = null }) => {
       });
       
       const url = queryParams.toString() 
-        ? `http://localhost:5000/api/rates/filtered?${queryParams.toString()}`
-        : 'http://localhost:5000/api/rates';
+        ? `/api/rates/filtered?${queryParams.toString()}`
+        : '/api/rates';
       
       const response = await fetch(url);
       

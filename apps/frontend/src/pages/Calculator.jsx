@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { generateDownPaymentOptions, formatCurrency } from '../utils/mortgageCalculations.js';
+import MortgageCalculator from '../components/MortgageCalculator.jsx';
+
+
 import { 
   LazyMortgagePaymentChart as MortgagePaymentChart,
   LazyAffordabilityChart as AffordabilityChart,
@@ -7,8 +10,7 @@ import {
   LazyDownPaymentChart as DownPaymentChart,
   LazyAmortizationChart as AmortizationChart
 } from '../components/charts/LazyChartWrapper.jsx';
-import { trackUserEngagement } from '../utils/analytics';
-import tooltipIcon from '../assets/ToolTip.png';
+
 
 // Credit score ranges for affordability calculator
 const creditScoreRanges = [
@@ -182,14 +184,7 @@ const landTransferTaxRules = {
 
 
 
-// CMHC Insurance rate function
-const getCMHCRate = (downPaymentPercent) => {
-  if (downPaymentPercent >= 20) return 0;
-  if (downPaymentPercent >= 15 && downPaymentPercent < 20) return 0.028;
-  if (downPaymentPercent >= 10 && downPaymentPercent < 15) return 0.031;
-  if (downPaymentPercent >= 5 && downPaymentPercent < 10) return 0.04;
-  return 0.04; // Default for anything below 5%
-};
+
 
 // Custom Tooltip Component
 const Tooltip = ({ children, content, position = "top" }) => {
@@ -256,221 +251,15 @@ const Tooltip = ({ children, content, position = "top" }) => {
   );
 };
 
-// Pure JS helper function for calculating cash needed to close
-const calcCashToClose = (homePrice, downPaymentPercent, isFirstTimeBuyer = false, province = 'ON') => {
-  // Calculate down payment
-  const downPayment = (homePrice * downPaymentPercent) / 100;
-  
-  // Calculate loan amount
-  const loanAmount = homePrice - downPayment;
-  
-  // Calculate CMHC insurance
-  const cmhcRate = downPaymentPercent >= 20 ? 0 : 
-                   downPaymentPercent >= 15 ? 0.028 :
-                   downPaymentPercent >= 10 ? 0.031 :
-                   downPaymentPercent >= 5 ? 0.04 : 0.04;
-  const cmhcAmount = cmhcRate > 0 ? Math.round(loanAmount * cmhcRate) : 0;
-  
-  // Calculate PST on CMHC (8% of CMHC amount)
-  const pstOnCMHC = cmhcAmount * 0.08;
-  
-  // Calculate land transfer tax based on province
-  let landTransferTax = 0;
-  
-  // Use the existing landTransferTaxRules for province-specific calculations
-  const rule = landTransferTaxRules[province];
-  if (rule) {
-    const calculateTieredTax = (tiers) => {
-      let tax = 0;
-      let remaining = homePrice;
-      let previous = 0;
 
-      for (const tier of tiers) {
-        if (remaining <= 0) break;
-        const taxable = Math.min(tier.upTo - previous, remaining);
-        const tierTax = taxable * tier.rate;
-        tax += tierTax;
-        remaining -= taxable;
-        previous = tier.upTo;
-      }
-      return tax;
-    };
-
-    // Calculate base provincial tax
-    const baseTax = calculateTieredTax(rule.baseRates || []);
-    
-    // Calculate municipal tax if applicable
-    let municipalTax = 0;
-    if (province === 'ON' && rule.cities?.['Toronto']?.municipalRates) {
-      municipalTax = calculateTieredTax(rule.cities['Toronto'].municipalRates);
-    } else if (province === 'QC' && rule.cities?.['Montreal']?.municipalRates) {
-      municipalTax = calculateTieredTax(rule.cities['Montreal'].municipalRates);
-    }
-
-    landTransferTax = baseTax + municipalTax;
-    
-    // Apply first-time buyer rebate
-    if (isFirstTimeBuyer && rule.firstTimeBuyerRebate) {
-      landTransferTax = Math.max(0, landTransferTax - rule.firstTimeBuyerRebate);
-    }
-  }
-  
-  // Fixed fees
-  const lawyerFees = 1000;
-  const titleInsurance = 900;
-  const homeInspection = 500;
-  const appraisalFees = 300;
-  
-  // Calculate total (including land transfer tax, excluding PST on CMHC)
-  let total = downPayment + landTransferTax + lawyerFees + titleInsurance + homeInspection + appraisalFees;
-  
-  // Apply first-time buyer $100 deduction
-  if (isFirstTimeBuyer) {
-    total -= 100;
-  }
-  
-  return {
-    downPayment,
-    landTransferTax,
-    cmhcAmount,
-    pstOnCMHC,
-    lawyerFees,
-    titleInsurance,
-    homeInspection,
-    appraisalFees,
-    total,
-    breakdown: [
-      { name: 'Down payment', amount: downPayment },
-      { name: 'Land transfer tax', amount: landTransferTax },
-      { name: 'PST on CMHC', amount: pstOnCMHC },
-      { name: 'Lawyer fees', amount: lawyerFees },
-      { name: 'Title insurance', amount: titleInsurance },
-      { name: 'Home inspection', amount: homeInspection },
-      { name: 'Appraisal fees', amount: appraisalFees }
-    ]
-  };
-};
 
 function Calculator() {
   // Tab state
   const [activeTab, setActiveTab] = useState('demo');
 
-  // Mortgage payment calculator form state - Updated with realistic values
-  const [formData, setFormData] = useState({
-    homePrice: 500000, // Changed from 3000 to 500000
-    downPayment: 100000, // Changed from 600 to 100000
-    downPaymentPercent: 20,
-    interestRate: 2.89,
-    amortizationPeriod: 25,
-    paymentFrequency: 'monthly',
-    propertyTax: 5000,
-    insurance: 1200,
-    condoFee: 0,
-    cmhc: 0
-  });
 
-  // Input display values - Synchronized with formData
-  const [inputValues, setInputValues] = useState({
-    homePrice: '500000', // Match formData.homePrice
-    downPayment: '100000', // Match formData.downPayment
-    interestRate: '2.89', // Match formData.interestRate
-    propertyTax: '5000', // Match formData.propertyTax
-    insurance: '1200', // Match formData.insurance
-    condoFee: '0' // Match formData.condoFee
-  });
 
-  // Calculate mortgage payments using the formula: P = L[c(1 + c)^n]/[(1 + c)^n – 1]
-  const calculateMortgage = () => {
-    const loanAmount = formData.homePrice - formData.downPayment;
-    const cmhcRate = getCMHCRate(formData.downPaymentPercent);
-    const cmhcAmount = cmhcRate > 0 ? Math.round(loanAmount * cmhcRate) : 0;
-    const totalMortgage = loanAmount + cmhcAmount;
-    
-    // Handle edge cases
-    if (totalMortgage <= 0 || formData.interestRate <= 0 || formData.amortizationPeriod <= 0) {
-      return {
-        loanAmount: 0,
-        monthlyPayment: 0,
-        frequencyPayment: 0,
-        totalInterest: 0,
-        totalPayment: 0,
-        monthlyPropertyTax: 0,
-        monthlyInsurance: 0,
-        monthlyCondoFee: 0,
-        monthlyCMHC: 0,
-        totalMonthlyCost: 0,
-        principalPortion: 0,
-        interestPortion: 0,
-        taxPortion: 0
-      };
-    }
-    
-    // Convert annual interest rate to monthly rate
-    const monthlyRate = formData.interestRate / 100 / 12;
-    const totalPayments = formData.amortizationPeriod * 12;
-    
-    // Calculate monthly payment using the formula: P = L[c(1 + c)^n]/[(1 + c)^n – 1]
-    // Where: P = monthly payment, L = total mortgage amount, c = monthly interest rate, n = total payments
-    const monthlyPayment = totalMortgage * 
-      (monthlyRate * Math.pow(1 + monthlyRate, totalPayments)) / 
-      (Math.pow(1 + monthlyRate, totalPayments) - 1);
-    
-    // Calculate total interest over the life of the loan
-    const totalInterest = (monthlyPayment * totalPayments) - totalMortgage;
-    
-    // Calculate total payments over the life of the loan
-    const totalPayment = monthlyPayment * totalPayments;
-    
-    // Calculate frequency-adjusted payment
-    let frequencyPayment = monthlyPayment;
-    if (formData.paymentFrequency === 'biweekly') {
-      frequencyPayment = monthlyPayment / 2;
-    } else if (formData.paymentFrequency === 'weekly') {
-      frequencyPayment = monthlyPayment / 4;
-    } else if (formData.paymentFrequency === 'accelerated') {
-      // Accelerated bi-weekly: 26 payments per year instead of 24
-      frequencyPayment = (monthlyPayment * 12) / 26;
-    } else if (formData.paymentFrequency === 'accelerated-weekly') {
-      // Accelerated weekly: 52 payments per year instead of 48
-      frequencyPayment = (monthlyPayment * 12) / 52;
-    }
-    
-    // Calculate monthly additional costs
-    const monthlyPropertyTax = formData.propertyTax / 12;
-    const monthlyInsurance = formData.insurance / 12;
-    const monthlyCondoFee = formData.condoFee; // Already monthly
-    const monthlyCMHC = cmhcAmount / 12;
-    
-    // Calculate total monthly cost including all expenses
-    const totalMonthlyCost = monthlyPayment + monthlyPropertyTax + monthlyInsurance + monthlyCondoFee + monthlyCMHC;
-    
-    // Calculate accurate principal and interest portions for the first payment
-    const firstPaymentInterest = totalMortgage * monthlyRate;
-    const firstPaymentPrincipal = monthlyPayment - firstPaymentInterest;
-    
-    // Calculate portions for the breakdown chart
-    const principalPortion = firstPaymentPrincipal;
-    const interestPortion = firstPaymentInterest;
-    const taxPortion = monthlyPropertyTax + monthlyInsurance + monthlyCondoFee + monthlyCMHC;
-    
-    return {
-      loanAmount,
-      totalMortgage,
-      cmhcAmount,
-      monthlyPayment,
-      frequencyPayment,
-      totalInterest,
-      totalPayment,
-      monthlyPropertyTax,
-      monthlyInsurance,
-      monthlyCondoFee,
-      monthlyCMHC,
-      totalMonthlyCost,
-      principalPortion,
-      interestPortion,
-      taxPortion
-    };
-  };
+
 
   // Affordability calculator form state
   const [affordabilityData, setAffordabilityData] = useState({
@@ -483,6 +272,7 @@ function Calculator() {
   // Land transfer tax calculator form state
   const [landTransferData, setLandTransferData] = useState({
     homePrice: 500000,
+    province: 'ON',
     isFirstTimeBuyer: false
   });
 
@@ -494,122 +284,9 @@ function Calculator() {
     cmhcInsurance: true
   });
 
-  // Demo calculator form state
-  const [demoData, setDemoData] = useState({
-    amortizationPeriod: 25,
-    mortgageRate: 3.84,
-    paymentFrequency: 'monthly',
-    isFirstTimeBuyer: false,
-    amortizationExpanded: true,
-    selectedDownPaymentPercent: 20,
-    selectedProvince: 'ON'
-  });
 
-  const [scrollProgress, setScrollProgress] = useState(0);
 
-  // Validation functions
-  const validateHomePrice = (value) => {
-    if (!value || value === '') {
-      return 'Home price is required';
-    }
-    if (isNaN(value) || value <= 0) {
-      return 'Home price must be a positive number';
-    }
-    if (value < 1000) {
-      return 'Home price must be at least $1,000';
-    }
-    if (value > 10000000) {
-      return 'Home price cannot exceed $10,000,000';
-    }
-    return null;
-  };
 
-  const validateInterestRate = (value) => {
-    if (!value || value === '') {
-      return 'Interest rate is required';
-    }
-    if (isNaN(value) || value <= 0) {
-      return 'Interest rate must be a positive number';
-    }
-    if (value < 0.1) {
-      return 'Interest rate must be at least 0.1%';
-    }
-    if (value > 25) {
-      return 'Interest rate cannot exceed 25%';
-    }
-    return null;
-  };
-
-  const validateAmortizationPeriod = (value) => {
-    if (!value || value === '') {
-      return 'Amortization period is required';
-    }
-    if (isNaN(value) || value <= 0) {
-      return 'Amortization period must be a positive number';
-    }
-    if (value < 1) {
-      return 'Amortization period must be at least 1 year';
-    }
-    if (value > 50) {
-      return 'Amortization period cannot exceed 50 years';
-    }
-    return null;
-  };
-
-  const validateDownPayment = (value, homePrice) => {
-    if (!value || value === '') {
-      return 'Down payment is required';
-    }
-    if (isNaN(value) || value < 0) {
-      return 'Down payment must be a positive number';
-    }
-    if (value >= homePrice) {
-      return 'Down payment cannot be greater than or equal to home price';
-    }
-    return null;
-  };
-
-  const validatePropertyTax = (value) => {
-    if (!value || value === '') {
-      return 'Property tax is required';
-    }
-    if (isNaN(value) || value < 0) {
-      return 'Property tax must be a positive number';
-    }
-    if (value > 100000) {
-      return 'Property tax cannot exceed $100,000';
-    }
-    return null;
-  };
-
-  const validateInsurance = (value) => {
-    if (!value || value === '') {
-      return 'Insurance is required';
-    }
-    if (isNaN(value) || value < 0) {
-      return 'Insurance must be a positive number';
-    }
-    if (value > 50000) {
-      return 'Insurance cannot exceed $50,000';
-    }
-    return null;
-  };
-
-  const validateCondoFee = (value) => {
-    if (!value || value === '') {
-      return 'Condo fee is required';
-    }
-    if (isNaN(value) || value < 0) {
-      return 'Condo fee must be a positive number';
-    }
-    if (value > 10000) {
-      return 'Condo fee cannot exceed $10,000';
-    }
-    return null;
-  };
-
-  // Calculate mortgage data whenever form data changes
-  const mortgageData = calculateMortgage();
 
   // Calculate affordability using Canadian mortgage stress test rules
   const calculateAffordability = () => {
@@ -696,15 +373,14 @@ function Calculator() {
   // 🧠 Tax Calculation Function
   // Calculates land transfer tax for given province, city, price, and first-time buyer status
   const calculateLandTransferTax = () => {
-    // Use Ontario as default province since we removed province selector
-    const rule = landTransferTaxRules['ON'];
+    const rule = landTransferTaxRules[landTransferData.province];
     if (!rule) {
       return { 
         total: 0, 
         breakdown: [], 
         rebate: 0, 
         additionalTaxes: [],
-        provinceName: 'Ontario',
+        provinceName: 'Unknown Province',
         hasRebate: false
       };
     }
@@ -742,15 +418,22 @@ function Calculator() {
     const baseTax = baseResult.tax;
     const baseBreakdown = baseResult.breakdown;
 
-    // Calculate municipal tax if applicable (using Toronto as default for Ontario)
+    // Calculate municipal tax if applicable
     let municipalTax = 0;
     let municipalBreakdown = [];
-    if (rule.cities?.['Toronto']?.municipalRates) {
+    if (landTransferData.province === 'ON' && rule.cities?.['Toronto']?.municipalRates) {
       const municipalResult = calculateTieredTax(rule.cities['Toronto'].municipalRates);
       municipalTax = municipalResult.tax;
       municipalBreakdown = municipalResult.breakdown.map(item => ({
         ...item,
         description: `Toronto Municipal ${item.description}`
+      }));
+    } else if (landTransferData.province === 'QC' && rule.cities?.['Montreal']?.municipalRates) {
+      const municipalResult = calculateTieredTax(rule.cities['Montreal'].municipalRates);
+      municipalTax = municipalResult.tax;
+      municipalBreakdown = municipalResult.breakdown.map(item => ({
+        ...item,
+        description: `Montreal Municipal ${item.description}`
       }));
     }
 
@@ -784,32 +467,7 @@ function Calculator() {
 
   // const downPaymentResults = calculateDownPayment(); // Removed as we're using generateDownPaymentOptions now
 
-  // Log calculation details for debugging
-  useEffect(() => {
-    console.log('Mortgage Calculation Updated:', {
-      homePrice: formData.homePrice,
-      downPayment: formData.downPayment,
-      loanAmount: mortgageData.loanAmount,
-      interestRate: formData.interestRate,
-      monthlyPayment: mortgageData.monthlyPayment,
-      totalInterest: mortgageData.totalInterest,
-      totalPayment: mortgageData.totalPayment
-    });
-  }, [formData, mortgageData]);
 
-  // Initialize CMHC calculation on component mount
-  useEffect(() => {
-    const cmhcRate = getCMHCRate(formData.downPaymentPercent);
-    const loanAmount = formData.homePrice - formData.downPayment;
-    const cmhcAmount = cmhcRate > 0 ? Math.round(loanAmount * (cmhcRate / 100)) : 0;
-    
-    if (formData.cmhc !== cmhcAmount) {
-      setFormData(prev => ({
-        ...prev,
-        cmhc: cmhcAmount
-      }));
-    }
-  }, []); // Only run on mount
 
   // Handle affordability input changes
   const handleAffordabilityChange = (field, value) => {
@@ -862,158 +520,7 @@ function Calculator() {
     });
   };
 
-  // Handle demo calculator input changes
-  const handleDemoChange = (field, value) => {
-    setDemoData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
 
-  // Update handleInputChange to properly sync inputValues and formData
-  const handleInputChange = (field, value) => {
-    // Update the display value immediately for better UX
-    setInputValues(prev => ({
-      ...prev,
-      [field]: value
-    }));
-
-    // Parse the value for validation and calculation
-    let parsedValue = value;
-    if (typeof value === 'string') {
-      // Remove currency symbols, commas, and spaces for numeric fields
-      if (['homePrice', 'downPayment', 'propertyTax', 'insurance', 'condoFee'].includes(field)) {
-        parsedValue = parseFloat(value.replace(/[$,]/g, '')) || 0;
-      } else if (field === 'downPaymentPercent') {
-        parsedValue = parseFloat(value.replace(/[%]/g, '')) || 0;
-      } else if (['interestRate'].includes(field)) {
-        parsedValue = parseFloat(value.replace(/[%]/g, '')) || 0;
-      } else if (['amortizationPeriod'].includes(field)) {
-        parsedValue = parseInt(value) || 0;
-      }
-    }
-
-    // Validate input based on field type
-    let error = null;
-    
-    switch (field) {
-      case 'homePrice':
-        error = validateHomePrice(parsedValue);
-        break;
-      case 'interestRate':
-        error = validateInterestRate(parsedValue);
-        break;
-      case 'amortizationPeriod':
-        error = validateAmortizationPeriod(parsedValue);
-        break;
-      case 'downPayment':
-        error = validateDownPayment(parsedValue, formData.homePrice);
-        break;
-      case 'propertyTax':
-        error = validatePropertyTax(parsedValue);
-        break;
-      case 'insurance':
-        error = validateInsurance(parsedValue);
-        break;
-      case 'condoFee':
-        error = validateCondoFee(parsedValue);
-        break;
-      default:
-        break;
-    }
-
-    // Track calculator interaction
-    trackUserEngagement('calculator_field_changed', {
-      field_name: field,
-      field_value: parsedValue,
-      calculator_type: 'mortgage_payment'
-    });
-
-
-
-    // Only update form data if validation passes or field is not numeric
-    if (!error || ['paymentFrequency'].includes(field)) {
-      setFormData(prev => {
-        const newData = { ...prev, [field]: parsedValue };
-        
-        // Auto-calculate down payment percentage
-        if (field === 'homePrice' || field === 'downPayment') {
-          const newDownPaymentPercent = (newData.downPayment / newData.homePrice) * 100;
-          newData.downPaymentPercent = Math.round(newDownPaymentPercent * 100) / 100;
-        }
-        
-        // Auto-calculate down payment amount
-        if (field === 'downPaymentPercent') {
-          const newDownPayment = (newData.homePrice * parsedValue) / 100;
-          newData.downPayment = Math.round(newDownPayment);
-          // Also update inputValues for downPayment
-          setInputValues(prev => ({
-            ...prev,
-            downPayment: newData.downPayment.toString()
-          }));
-        }
-        
-        // Calculate CMHC insurance based on down payment percentage
-        if (field === 'homePrice' || field === 'downPayment' || field === 'downPaymentPercent') {
-          const downPaymentPercent = field === 'downPaymentPercent' ? parsedValue : newData.downPaymentPercent;
-          const cmhcRate = getCMHCRate(downPaymentPercent);
-          const loanAmount = newData.homePrice - newData.downPayment;
-          newData.cmhc = cmhcRate > 0 ? Math.round(loanAmount * (cmhcRate / 100)) : 0;
-        }
-        
-        return newData;
-      });
-    }
-  };
-
-  // Handle input blur to format the display value
-  const handleInputBlur = (field) => {
-    const value = inputValues[field];
-    let formattedValue = value;
-    
-    if (['homePrice', 'downPayment', 'propertyTax', 'insurance', 'condoFee'].includes(field)) {
-      const numValue = parseFloat(value.replace(/[$,]/g, '')) || 0;
-      formattedValue = numValue.toLocaleString();
-    } else if (field === 'interestRate') {
-      const numValue = parseFloat(value.replace(/[%]/g, '')) || 0;
-      formattedValue = `${numValue}%`;
-    }
-    
-    setInputValues(prev => ({
-      ...prev,
-      [field]: formattedValue
-    }));
-  };
-
-  // Handle input focus to show raw value for editing
-  const handleInputFocus = (field) => {
-    const value = inputValues[field];
-    let rawValue = value;
-    
-    if (['homePrice', 'downPayment', 'propertyTax', 'insurance', 'condoFee'].includes(field)) {
-      const numValue = parseFloat(value.replace(/[$,]/g, '')) || 0;
-      rawValue = numValue.toString();
-    } else if (field === 'interestRate') {
-      const numValue = parseFloat(value.replace(/[%]/g, '')) || 0;
-      rawValue = numValue.toString();
-    }
-    
-    setInputValues(prev => ({
-      ...prev,
-      [field]: rawValue
-    }));
-  };
-
-  // Handle scroll progress
-  const handleScroll = (e) => {
-    const element = e.target;
-    const scrollLeft = element.scrollLeft;
-    const scrollWidth = element.scrollWidth;
-    const clientWidth = element.clientWidth;
-    const maxScroll = scrollWidth - clientWidth;
-    const progress = maxScroll > 0 ? (scrollLeft / maxScroll) * 100 : 0;
-    setScrollProgress(progress);
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -1076,6 +583,7 @@ function Calculator() {
             >
               Down Payment
             </button>
+
           </div>
         </div>
 
@@ -1285,7 +793,34 @@ function Calculator() {
             <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
               <h2 className="text-2xl font-semibold text-[#1B5E20] mb-6">Land Transfer Tax Calculator</h2>
               
-
+              {/* Province Selection */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-[#1B5E20] mb-2">
+                  Province/Territory
+                </label>
+                <select
+                  value={landTransferData.province}
+                  onChange={(e) => handleLandTransferChange('province', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent text-lg font-medium"
+                >
+                  <option value="ON">Ontario</option>
+                  <option value="BC">British Columbia</option>
+                  <option value="AB">Alberta</option>
+                  <option value="QC">Quebec</option>
+                  <option value="MB">Manitoba</option>
+                  <option value="NB">New Brunswick</option>
+                  <option value="NL">Newfoundland and Labrador</option>
+                  <option value="NS">Nova Scotia</option>
+                  <option value="PE">Prince Edward Island</option>
+                  <option value="SK">Saskatchewan</option>
+                  <option value="NT">Northwest Territories</option>
+                  <option value="NU">Nunavut</option>
+                  <option value="YT">Yukon</option>
+                </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  Tax rates vary significantly by province
+                </p>
+              </div>
 
               {/* Home Price Input */}
               <div className="mb-6">
@@ -1349,32 +884,95 @@ function Calculator() {
               {/* Tax Breakdown */}
               <div className="bg-gray-50 rounded-lg p-4">
                 <h3 className="text-lg font-semibold text-[#1B5E20] mb-3">
-                  Ontario Tax Breakdown
+                  {landTransferResults.provinceName} Tax Breakdown
                 </h3>
-                <div className="space-y-2">
-                  {landTransferResults.breakdown.map((bracket, idx) => (
-                    <div key={idx} className="flex justify-between text-sm">
-                      <span className="text-gray-600">
-                        ${bracket.amount.toLocaleString()} @ {(bracket.rate * 100).toFixed(2)}%
-                      </span>
-                      <span className="font-medium">
-                        ${bracket.tax.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                      </span>
+                
+                {/* Provincial Tax */}
+                {landTransferResults.baseTax > 0 && (
+                  <div className="mb-4">
+                    <h4 className="text-sm font-medium text-gray-900 mb-2">Provincial Tax</h4>
+                    <div className="space-y-2">
+                      {landTransferResults.breakdown.filter(item => !item.description.includes('Municipal')).map((bracket, idx) => (
+                        <div key={idx} className="flex justify-between text-sm">
+                          <span className="text-gray-600">
+                            ${bracket.amount.toLocaleString()} @ {(bracket.rate * 100).toFixed(2)}%
+                          </span>
+                          <span className="font-medium">
+                            ${bracket.tax.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                          </span>
+                        </div>
+                      ))}
+                      <div className="flex justify-between text-sm font-semibold border-t border-gray-200 pt-2">
+                        <span className="text-gray-900">Provincial Total:</span>
+                        <span className="text-[#1B5E20]">
+                          ${landTransferResults.baseTax.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                        </span>
+                      </div>
                     </div>
-                  ))}
-                  
-                  {/* Additional Taxes */}
-                  {landTransferResults.additionalTaxes.map((tax, idx) => (
-                    <div key={`additional-${idx}`} className="flex justify-between text-sm border-t border-gray-200 pt-2 mt-2">
-                      <span className="text-gray-600">
-                        {tax.name} ({(tax.rate * 100).toFixed(2)}%)
-                      </span>
-                      <span className="font-medium">
-                        ${tax.amount.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                      </span>
+                  </div>
+                )}
+
+                {/* Municipal Tax */}
+                {landTransferResults.municipalTax > 0 && (
+                  <div className="mb-4">
+                    <h4 className="text-sm font-medium text-gray-900 mb-2">Municipal Tax</h4>
+                    <div className="space-y-2">
+                      {landTransferResults.breakdown.filter(item => item.description.includes('Municipal')).map((bracket, idx) => (
+                        <div key={idx} className="flex justify-between text-sm">
+                          <span className="text-gray-600">
+                            ${bracket.amount.toLocaleString()} @ {(bracket.rate * 100).toFixed(2)}%
+                          </span>
+                          <span className="font-medium">
+                            ${bracket.tax.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                          </span>
+                        </div>
+                      ))}
+                      <div className="flex justify-between text-sm font-semibold border-t border-gray-200 pt-2">
+                        <span className="text-gray-900">Municipal Total:</span>
+                        <span className="text-[#1B5E20]">
+                          ${landTransferResults.municipalTax.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                        </span>
+                      </div>
                     </div>
-                  ))}
+                  </div>
+                )}
+
+                {/* Total Before Rebate */}
+                <div className="border-t border-gray-300 pt-3 mb-3">
+                  <div className="flex justify-between text-sm font-semibold">
+                    <span className="text-gray-900">Total Before Rebate:</span>
+                    <span className="text-[#1B5E20]">
+                      ${landTransferResults.totalBeforeRebate.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
                 </div>
+
+                {/* First-Time Buyer Rebate */}
+                {landTransferResults.rebate > 0 && (
+                  <div className="mb-3">
+                    <div className="flex justify-between text-sm font-semibold text-green-600">
+                      <span>First-Time Buyer Rebate:</span>
+                      <span>-${landTransferResults.rebate.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Additional Taxes */}
+                {landTransferResults.additionalTaxes.length > 0 && (
+                  <div className="border-t border-gray-200 pt-3">
+                    <h4 className="text-sm font-medium text-gray-900 mb-2">Additional Taxes</h4>
+                    {landTransferResults.additionalTaxes.map((tax, idx) => (
+                      <div key={`additional-${idx}`} className="flex justify-between text-sm">
+                        <span className="text-gray-600">
+                          {tax.name} ({(tax.rate * 100).toFixed(2)}%)
+                        </span>
+                        <span className="font-medium">
+                          ${tax.amount.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* First-time Buyer Information */}
@@ -1382,10 +980,19 @@ function Calculator() {
                 <div className="mt-4 bg-green-50 rounded-lg p-4 border border-green-200">
                   <h4 className="font-semibold text-green-900 mb-2">First-Time Buyer Information</h4>
                   <p className="text-sm text-green-800">
-                    Ontario offers a first-time home buyer rebate of up to ${
-                      landTransferResults.rebate > 0 ? landTransferResults.rebate.toLocaleString() : 
-                      landTransferTaxRules['ON']?.firstTimeBuyerRebate.toLocaleString()
+                    {landTransferResults.provinceName} offers a first-time home buyer rebate of up to ${
+                      landTransferTaxRules[landTransferData.province]?.firstTimeBuyerRebate.toLocaleString()
                     }.
+                  </p>
+                </div>
+              )}
+
+              {/* No Rebate Information */}
+              {!landTransferResults.hasRebate && landTransferData.isFirstTimeBuyer && (
+                <div className="mt-4 bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                  <h4 className="font-semibold text-yellow-900 mb-2">First-Time Buyer Information</h4>
+                  <p className="text-sm text-yellow-800">
+                    {landTransferResults.provinceName} does not currently offer a first-time home buyer rebate for land transfer tax.
                   </p>
                 </div>
               )}
@@ -1394,9 +1001,10 @@ function Calculator() {
               <div className="mt-6 bg-blue-50 rounded-lg p-4 border border-blue-200">
                 <h4 className="font-semibold text-blue-900 mb-2">Important Notes</h4>
                 <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• Tax rates vary by province</li>
+                  <li>• Tax rates vary significantly by province</li>
+                  <li>• Alberta has no provincial land transfer tax</li>
+                  <li>• Municipal taxes apply in Toronto (ON) and Montreal (QC)</li>
                   <li>• First-time buyer rebates may apply</li>
-                  <li>• Additional municipal taxes may apply</li>
                   <li>• Consult with a legal professional for accuracy</li>
                 </ul>
               </div>
@@ -1410,7 +1018,9 @@ function Calculator() {
               municipalTax: landTransferResults.municipalTax,
               totalTax: landTransferResults.total,
               homePrice: landTransferData.homePrice,
-              firstTimeBuyerRebate: landTransferResults.rebate
+              firstTimeBuyerRebate: landTransferResults.rebate,
+              province: landTransferData.province,
+              provinceName: landTransferResults.provinceName
             }} />
           </div>
         </>
@@ -1590,581 +1200,10 @@ function Calculator() {
                 {/* Demo Calculator Tab */}
         {activeTab === 'demo' && (
           <>
-            <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 border border-gray-200">
-              <h2 className="text-xl sm:text-2xl font-semibold text-[#1B5E20] mb-3 sm:mb-4">Mortgage Payment Calculator</h2>
-              <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">Calculate your mortgage payments and explore different scenarios with our comprehensive calculator.</p>
-              
-              {/* Start Here Section */}
-              <div className="mb-8">
-                <div>
-                  {/* Start Here - Price Input */}
-                  <div className="mb-6">
-                    <label className="block text-sm font-medium text-[#1B5E20] mb-2">
-                      Start here
-                      <Tooltip content="Enter the purchase price of the home you're interested in. This is the total amount you'll pay for the property.">
-                        <img src={tooltipIcon} alt="Info" className="ml-1 w-4 h-4 cursor-help hover:opacity-80 transition-opacity" loading="lazy" />
-                      </Tooltip>
-                    </label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
-                      <input
-                        type="text"
-                        value={inputValues.homePrice}
-                        onChange={(e) => handleInputChange('homePrice', e.target.value)}
-                        onBlur={() => handleInputBlur('homePrice')}
-                        onFocus={() => handleInputFocus('homePrice')}
-                        className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent text-lg font-medium"
-                        placeholder="500,000"
-                      />
-                </div>
-              </div>
-
-              {/* Additional Input Fields */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    {/* Interest Rate Input */}
-                  <div>
-                    <label className="block text-sm font-medium text-[#1B5E20] mb-2">
-                        Annual Interest Rate
-                        <Tooltip content="The annual interest rate on your mortgage. This affects your monthly payment amount.">
-                        <img src={tooltipIcon} alt="Info" className="ml-1 w-4 h-4 cursor-help hover:opacity-80 transition-opacity" loading="lazy" />
-                      </Tooltip>
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={inputValues.interestRate}
-                        onChange={(e) => handleInputChange('interestRate', e.target.value)}
-                        onBlur={() => handleInputBlur('interestRate')}
-                        onFocus={() => handleInputFocus('interestRate')}
-                          className="w-full pl-4 pr-8 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent"
-                          placeholder="3.84"
-                      />
-                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Current rate: {formData.interestRate}% • Changes will update all calculations
-                      {formData.interestRate !== parseFloat(inputValues.interestRate.replace(/[%]/g, '') || 0) && (
-                        <span className="ml-2 text-[#2E7D32] animate-pulse">🔄 Updating...</span>
-                      )}
-                    </p>
-                  </div>
-
-                    {/* Amortization Period Input */}
-                  <div>
-                    <label className="block text-sm font-medium text-[#1B5E20] mb-2">
-                      Amortization Period
-                        <Tooltip content="The total time to pay off your mortgage. Longer periods mean lower monthly payments but more total interest.">
-                        <img src={tooltipIcon} alt="Info" className="ml-1 w-4 h-4 cursor-help hover:opacity-80 transition-opacity" loading="lazy" />
-                      </Tooltip>
-                    </label>
-                      <select
-                        value={formData.amortizationPeriod}
-                        onChange={(e) => handleInputChange('amortizationPeriod', e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent text-sm sm:text-base"
-                      >
-                        {Array.from({ length: 30 }, (_, i) => 30 - i).map(year => (
-                          <option key={year} value={year}>{year} years</option>
-                        ))}
-                      </select>
-                  </div>
-
-                    {/* Payment Frequency Input */}
-                  <div>
-                    <label className="block text-sm font-medium text-[#1B5E20] mb-2">
-                      Payment Frequency
-                        <Tooltip content="How often you make mortgage payments. More frequent payments can reduce total interest paid.">
-                        <img src={tooltipIcon} alt="Info" className="ml-1 w-4 h-4 cursor-help hover:opacity-80 transition-opacity" loading="lazy" />
-                      </Tooltip>
-                    </label>
-                    <select
-                      value={formData.paymentFrequency}
-                      onChange={(e) => handleInputChange('paymentFrequency', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent"
-                    >
-                      <option value="monthly">Monthly</option>
-                      <option value="biweekly">Bi-weekly</option>
-                      <option value="weekly">Weekly</option>
-                      <option value="accelerated">Accelerated Bi-weekly</option>
-                      <option value="accelerated-weekly">Accelerated Weekly</option>
-                    </select>
-                  </div>
-                  </div>
-                </div>
-              </div>
-
-
-
-
-
-
-
-
-
-
-
-              {/* Main Calculator Grid */}
-              <div className="relative mt-12 sm:mt-0">
-                {/* Scroll indicator for mobile */}
-                <div className="sm:hidden absolute -top-10 right-0 z-10 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1.5 text-xs text-gray-600 border border-gray-200 shadow-md">
-                  <span className="flex items-center font-medium">
-                    <svg className="w-3 h-3 mr-1.5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16l-4-4m0 0l4-4m-4 4h18" />
-                    </svg>
-                    Swipe to see all rates
-                  </span>
-                </div>
-                
-                {/* Scroll progress indicator */}
-                <div className="sm:hidden absolute bottom-0 left-0 right-0 h-1 bg-gray-100 z-10">
-                  <div 
-                    className="h-full bg-[#1B5E20] transition-all duration-300" 
-                    style={{ width: `${scrollProgress}%` }}
-                  ></div>
-                </div>
-                
-                <div 
-                  className="overflow-x-auto -mx-4 sm:mx-0 border border-gray-200 rounded-lg" 
-                  onScroll={handleScroll}
-                  style={{
-                    scrollbarWidth: 'thin',
-                    scrollbarColor: '#d1d5db #f3f4f6'
-                  }}
-                >
-                  <style jsx>{`
-                    .overflow-x-auto::-webkit-scrollbar {
-                      height: 8px;
-                    }
-                    .overflow-x-auto::-webkit-scrollbar-track {
-                      background: #f3f4f6;
-                      border-radius: 4px;
-                    }
-                    .overflow-x-auto::-webkit-scrollbar-thumb {
-                      background: #d1d5db;
-                      border-radius: 4px;
-                    }
-                    .overflow-x-auto::-webkit-scrollbar-thumb:hover {
-                      background: #9ca3af;
-                    }
-                  `}</style>
-                                    <div className="min-w-[1200px] sm:min-w-full pb-4 sm:pb-0">
-                    {/* Visual scroll hint */}
-                    <div className="sm:hidden absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none z-5"></div>
-                    <div className="sm:hidden absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none z-5"></div>
-                    {/* Grid Header */}
-                    <div className="grid grid-cols-5 gap-6 sm:gap-8 mb-3 sm:mb-4 px-4 sm:px-0">
-                    <div className="text-xs sm:text-sm font-medium text-gray-700"></div>
-                    <div className="text-center text-xs sm:text-sm font-semibold text-[#1B5E20]">5%</div>
-                    <div className="text-center text-xs sm:text-sm font-semibold text-[#1B5E20]">10%</div>
-                    <div className="text-center text-xs sm:text-sm font-semibold text-[#1B5E20]">15%</div>
-                    <div className="text-center text-xs sm:text-sm font-semibold text-[#1B5E20]">20%</div>
-                  </div>
-
-                  {/* Down Payment Row */}
-                  <div className="grid grid-cols-5 gap-6 sm:gap-8 mb-3 sm:mb-4 p-2 sm:p-3 border border-gray-200 rounded-lg px-4 sm:px-0">
-                    <div className="flex items-center text-xs sm:text-sm font-medium text-gray-700">
-                      <span className="mr-1 sm:mr-2">−</span>
-                      <span className="hidden sm:inline">Down payment</span>
-                      <span className="sm:hidden">Down</span>
-                      <Tooltip content="The amount of money you pay upfront when buying a home. A larger down payment means a smaller mortgage and lower monthly payments.">
-                        <img src={tooltipIcon} alt="Info" className="ml-1 sm:ml-2 w-3 h-3 sm:w-4 sm:h-4 cursor-help hover:opacity-80 transition-opacity" loading="lazy" />
-                      </Tooltip>
-                    </div>
-                    {[5, 10, 15, 20].map((percent) => (
-                      <div key={`dp-${percent}`} className="text-center">
-                        <div className="text-xs sm:text-sm font-medium text-gray-900 mb-1">{percent}%</div>
-                        <div 
-                          className="text-xs sm:text-sm font-semibold text-[#1B5E20]"
-                          aria-live="polite"
-                          aria-label={`Down payment for ${percent} percent: $${Math.round((formData.homePrice * percent) / 100).toLocaleString()}`}
-                        >
-                          ${Math.round((formData.homePrice * percent) / 100).toLocaleString()}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* CMHC Insurance Row */}
-                  <div className="grid grid-cols-5 gap-6 sm:gap-8 mb-3 sm:mb-4 p-2 sm:p-3 border border-gray-200 rounded-lg px-4 sm:px-0">
-                    <div className="flex items-center text-xs sm:text-sm font-medium text-gray-700">
-                      <span className="mr-1 sm:mr-2">+</span>
-                      <span className="hidden sm:inline">CMHC insurance</span>
-                      <span className="sm:hidden">CMHC</span>
-                      <Tooltip content="Mortgage default insurance required when your down payment is less than 20%. This protects the lender and is added to your mortgage amount.">
-                        <img src={tooltipIcon} alt="Info" className="ml-1 sm:ml-2 w-3 h-3 sm:w-4 sm:h-4 cursor-help hover:opacity-80 transition-opacity" loading="lazy" />
-                      </Tooltip>
-                    </div>
-                    {[5, 10, 15, 20].map((percent) => {
-                      const downPayment = (formData.homePrice * percent) / 100;
-                      const loanAmount = formData.homePrice - downPayment;
-                      const cmhcRate = getCMHCRate(percent);
-                      const cmhcAmount = cmhcRate > 0 ? Math.round(loanAmount * cmhcRate) : 0;
-                      
-                      return (
-                        <div key={`cmhc-${percent}`} className="text-center">
-                          <div 
-                            className="text-xs sm:text-sm font-semibold text-[#2E7D32]"
-                            aria-live="polite"
-                            aria-label={`CMHC insurance for ${percent} percent down payment: $${cmhcAmount.toLocaleString()}`}
-                          >
-                            ${cmhcAmount.toLocaleString()}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Total Mortgage Row - Green Theme Highlighted */}
-                  <div className="grid grid-cols-5 gap-6 sm:gap-8 mb-3 sm:mb-4 p-3 sm:p-4 bg-green-50 border border-green-200 rounded-lg px-4 sm:px-0">
-                    <div className="flex items-center text-xs sm:text-sm font-semibold text-[#1B5E20]">
-                      <span className="mr-1 sm:mr-2">=</span>
-                      <span className="hidden sm:inline">Total mortgage</span>
-                      <span className="sm:hidden">Total</span>
-                      <Tooltip content="The total amount you're borrowing, including the loan amount plus any CMHC insurance. This is what you'll pay interest on.">
-                        <img src={tooltipIcon} alt="Info" className="ml-1 sm:ml-2 w-3 h-3 sm:w-4 sm:h-4 cursor-help hover:opacity-80 transition-opacity" loading="lazy" />
-                      </Tooltip>
-                    </div>
-                    {[5, 10, 15, 20].map((percent) => {
-                      const downPayment = (formData.homePrice * percent) / 100;
-                      const loanAmount = formData.homePrice - downPayment;
-                      const cmhcRate = getCMHCRate(percent);
-                      const cmhcAmount = cmhcRate > 0 ? Math.round(loanAmount * (cmhcRate / 100)) : 0;
-                      const totalMortgage = loanAmount + cmhcAmount;
-                      
-                      return (
-                        <div key={`total-${percent}`} className="text-center">
-                          <div 
-                            className="text-lg sm:text-2xl font-bold text-[#1B5E20]"
-                            aria-live="polite"
-                            aria-label={`Total mortgage for ${percent} percent down payment: $${totalMortgage.toLocaleString()}`}
-                          >
-                            ${totalMortgage.toLocaleString()}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-
-
-                  {/* Interest Rate Indicator */}
-                  <div className="text-center mb-2">
-                    <div className="text-xs text-[#2E7D32] bg-green-100 px-3 py-1 rounded-full inline-block">
-                      Based on {formData.interestRate}% interest rate • {formData.amortizationPeriod} year amortization
-                    </div>
-                  </div>
-                  
-                  {/* Mortgage Payment Row - Green Theme Highlighted */}
-                  <div className="grid grid-cols-5 gap-6 sm:gap-8 mb-3 sm:mb-4 p-3 sm:p-4 bg-green-50 border border-green-200 rounded-lg px-4 sm:px-0">
-                    <div className="flex items-center text-xs sm:text-sm font-semibold text-[#1B5E20]">
-                      <span className="mr-1 sm:mr-2">=</span>
-                      <span className="hidden sm:inline">Mortgage payment</span>
-                      <span className="sm:hidden">Payment</span>
-                      <Tooltip content="Your regular payment amount based on the mortgage amount, interest rate, and payment frequency. This is what you'll pay each period.">
-                        <img src={tooltipIcon} alt="Info" className="ml-1 sm:ml-2 w-3 h-3 sm:w-4 sm:h-4 cursor-help hover:opacity-80 transition-opacity" loading="lazy" />
-                      </Tooltip>
-                    </div>
-                                          {[5, 10, 15, 20].map((percent) => {
-                      const downPayment = (formData.homePrice * percent) / 100;
-                      const loanAmount = formData.homePrice - downPayment;
-                      const cmhcRate = getCMHCRate(percent);
-                      const cmhcAmount = cmhcRate > 0 ? Math.round(loanAmount * cmhcRate) : 0;
-                      const totalMortgage = loanAmount + cmhcAmount;
-                      
-                      // Use dynamic interest rate from formData
-                      const monthlyRate = formData.interestRate / 100 / 12;
-                      const totalPayments = formData.amortizationPeriod * 12;
-                      
-                      // Handle edge cases for calculation
-                      let monthlyPayment = 0;
-                      if (totalMortgage > 0 && formData.interestRate > 0 && formData.amortizationPeriod > 0) {
-                        monthlyPayment = totalMortgage * 
-                          (monthlyRate * Math.pow(1 + monthlyRate, totalPayments)) / 
-                          (Math.pow(1 + monthlyRate, totalPayments) - 1);
-                      }
-                      
-                      // Calculate frequency-adjusted payment
-                      let frequencyPayment = monthlyPayment;
-                      if (formData.paymentFrequency === 'biweekly') {
-                        frequencyPayment = monthlyPayment / 2;
-                      } else if (formData.paymentFrequency === 'weekly') {
-                        frequencyPayment = monthlyPayment / 4;
-                      } else if (formData.paymentFrequency === 'accelerated') {
-                        // Accelerated bi-weekly: 26 payments per year instead of 24
-                        frequencyPayment = (monthlyPayment * 12) / 26;
-                      } else if (formData.paymentFrequency === 'accelerated-weekly') {
-                        // Accelerated weekly: 52 payments per year instead of 48
-                        frequencyPayment = (monthlyPayment * 12) / 52;
-                      }
-
-                      // Get frequency label
-                      const getFrequencyLabel = () => {
-                        switch (formData.paymentFrequency) {
-                          case 'biweekly': return 'Bi-weekly';
-                          case 'weekly': return 'Weekly';
-                          case 'accelerated': return 'Acc. Bi-weekly';
-                          case 'accelerated-weekly': return 'Acc. Weekly';
-                          default: return 'Monthly';
-                        }
-                      };
-                      
-                      return (
-                        <div key={`payment-${percent}`} className="text-center">
-                          <div 
-                            className="text-lg sm:text-2xl font-bold text-[#1B5E20]"
-                            aria-live="polite"
-                            aria-label={`${getFrequencyLabel()} mortgage payment for ${percent} percent down payment: $${Math.round(frequencyPayment).toLocaleString()}`}
-                          >
-                            ${Math.round(frequencyPayment).toLocaleString()}
-                          </div>
-                          <div className="text-xs text-[#2E7D32] mt-1">
-                            {getFrequencyLabel()}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-
-
-
-
-
-
-
-
-              {/* Cash Needed to Close Section - Always Visible */}
-              <div className="mt-8 border p-4 rounded-lg bg-white">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-medium text-[#1B5E20]">
-                    Cash Needed to Close
-                  </h3>
-                  <div className="text-xs text-[#2E7D32] bg-green-100 px-2 py-1 rounded-full">
-                    Based on ${formData.homePrice.toLocaleString()} home price
-                  </div>
-                </div>
-                
-                {/* Down Payment Percentage Selector */}
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-[#1B5E20] mb-2">
-                    Down Payment Percentage
-                  </label>
-                  <select
-                    value={demoData.selectedDownPaymentPercent}
-                    onChange={(e) => handleDemoChange('selectedDownPaymentPercent', parseInt(e.target.value))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent"
-                  >
-                    <option value={5}>5%</option>
-                    <option value={10}>10%</option>
-                    <option value={15}>15%</option>
-                    <option value={20}>20%</option>
-                    <option value={25}>25%</option>
-                    <option value={30}>30%</option>
-                    <option value={35}>35%</option>
-                  </select>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {demoData.selectedDownPaymentPercent >= 20 
-                      ? "✅ No CMHC insurance required (20%+ down payment)" 
-                      : "⚠️ CMHC insurance required (under 20% down payment)"
-                    }
-                  </p>
-                </div>
-
-                {/* Province Selector for Land Transfer Tax */}
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-[#1B5E20] mb-2">
-                    Province (for Land Transfer Tax)
-                  </label>
-                  <select
-                    value={demoData.selectedProvince || 'ON'}
-                    onChange={(e) => handleDemoChange('selectedProvince', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent"
-                  >
-                    <option value="ON">Ontario</option>
-                    <option value="BC">British Columbia</option>
-                    <option value="AB">Alberta</option>
-                    <option value="QC">Quebec</option>
-                    <option value="MB">Manitoba</option>
-                    <option value="NB">New Brunswick</option>
-                    <option value="NL">Newfoundland and Labrador</option>
-                    <option value="NS">Nova Scotia</option>
-                    <option value="PE">Prince Edward Island</option>
-                    <option value="SK">Saskatchewan</option>
-                    <option value="NT">Northwest Territories</option>
-                    <option value="NU">Nunavut</option>
-                    <option value="YT">Yukon</option>
-                  </select>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Land transfer tax rates vary by province. Current selection: {landTransferTaxRules[demoData.selectedProvince]?.name || 'Ontario'}
-                  </p>
-                </div>
-
-
-
-
-
-                    <div className="space-y-3">
-                                      {(() => {
-                    const cashToClose = calcCashToClose(formData.homePrice, demoData.selectedDownPaymentPercent, demoData.isFirstTimeBuyer, demoData.selectedProvince);
-                    return (
-                      <>
-                      {/* Down Payment */}
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-700">Down payment</span>
-                        <span className="font-medium text-right">
-                            ${cashToClose.downPayment.toLocaleString()}
-                        </span>
-                      </div>
-
-                      {/* Land Transfer Tax */}
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-700">
-                          Land transfer tax 
-                          <span className="text-xs text-[#2E7D32] ml-1">
-                            ({landTransferTaxRules[demoData.selectedProvince]?.name || 'Ontario'})
-                          </span>
-                        </span>
-                        <span className="font-medium text-right">
-                          ${cashToClose.landTransferTax.toLocaleString()}
-                        </span>
-                      </div>
-
-                      
-
-                      {/* Lawyer Fees */}
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-700">Lawyer fees</span>
-                          <span className="font-medium text-right">${cashToClose.lawyerFees.toLocaleString()}</span>
-                      </div>
-
-                      {/* Title Insurance */}
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-700">Title insurance</span>
-                          <span className="font-medium text-right">${cashToClose.titleInsurance.toLocaleString()}</span>
-                      </div>
-
-                      {/* Home Inspection */}
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-700">Home inspection</span>
-                          <span className="font-medium text-right">${cashToClose.homeInspection.toLocaleString()}</span>
-                      </div>
-
-                      {/* Appraisal Fees */}
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-700">Appraisal fees</span>
-                          <span className="font-medium text-right">${cashToClose.appraisalFees.toLocaleString()}</span>
-                      </div>
-
-                      {/* Total */}
-                      <div className="flex justify-between items-center pt-3 border-t border-gray-200">
-                        <span className="font-semibold text-[#1B5E20]">Total Cash to Close</span>
-                        <span className="font-semibold text-[#1B5E20] text-right">
-                            ${cashToClose.total.toLocaleString()}
-                        </span>
-                      </div>
-                      </>
-                    );
-                  })()}
-                    </div>
-              </div>
-
-
-
-          {/* Fixed Call-to-Action Bar */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                <div className="flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0">
-                  <div className="text-center sm:text-left">
-                    <p 
-                      className="text-sm sm:text-base lg:text-lg font-medium text-gray-900"
-                      aria-live="polite"
-                      aria-label={`Summary: Based on your selections, your monthly payment is $${(() => {
-                        const downPayment = (formData.homePrice * 20) / 100;
-                        const loanAmount = formData.homePrice - downPayment;
-                        const cmhcRate = getCMHCRate(20);
-                        const cmhcAmount = cmhcRate > 0 ? Math.round(loanAmount * cmhcRate) : 0;
-                        const totalMortgage = loanAmount + cmhcAmount;
-                        const monthlyRate = formData.interestRate / 100 / 12;
-                        const totalPayments = formData.amortizationPeriod * 12;
-                        const monthlyPayment = totalMortgage * 
-                          (monthlyRate * Math.pow(1 + monthlyRate, totalPayments)) / 
-                          (Math.pow(1 + monthlyRate, totalPayments) - 1);
-                        
-                        // Calculate frequency-adjusted payment
-                        let frequencyPayment = monthlyPayment;
-                        if (formData.paymentFrequency === 'biweekly') {
-                          frequencyPayment = monthlyPayment / 2;
-                        } else if (formData.paymentFrequency === 'weekly') {
-                          frequencyPayment = monthlyPayment / 4;
-                        } else if (formData.paymentFrequency === 'accelerated') {
-                          frequencyPayment = (monthlyPayment * 12) / 26;
-                        } else if (formData.paymentFrequency === 'accelerated-weekly') {
-                          frequencyPayment = (monthlyPayment * 12) / 52;
-                        }
-                        
-                        return Math.round(frequencyPayment).toLocaleString();
-                      })()} and you'll need $${(() => {
-                        const cashToClose = calcCashToClose(formData.homePrice, demoData.selectedDownPaymentPercent, demoData.isFirstTimeBuyer, demoData.selectedProvince);
-                        return cashToClose.total.toLocaleString();
-                      })()} to close`}
-                    >
-                      Based on your selections, your monthly payment is{' '}
-                      <span className="text-[#1B5E20] font-semibold">
-                        ${(() => {
-                          const downPayment = (formData.homePrice * demoData.selectedDownPaymentPercent) / 100;
-                          const loanAmount = formData.homePrice - downPayment;
-                          const cmhcRate = getCMHCRate(demoData.selectedDownPaymentPercent);
-                          const cmhcAmount = cmhcRate > 0 ? Math.round(loanAmount * cmhcRate) : 0;
-                          const totalMortgage = loanAmount + cmhcAmount;
-                          
-                          // Use dynamic interest rate with edge case handling
-                          const monthlyRate = formData.interestRate / 100 / 12;
-                          const totalPayments = formData.amortizationPeriod * 12;
-                          
-                          let monthlyPayment = 0;
-                          if (totalMortgage > 0 && formData.interestRate > 0 && formData.amortizationPeriod > 0) {
-                            monthlyPayment = totalMortgage * 
-                              (monthlyRate * Math.pow(1 + monthlyRate, totalPayments)) / 
-                              (Math.pow(1 + monthlyRate, totalPayments) - 1);
-                          }
-                          
-                          // Calculate frequency-adjusted payment
-                          let frequencyPayment = monthlyPayment;
-                          if (formData.paymentFrequency === 'biweekly') {
-                            frequencyPayment = monthlyPayment / 2;
-                          } else if (formData.paymentFrequency === 'weekly') {
-                            frequencyPayment = monthlyPayment / 4;
-                          } else if (formData.paymentFrequency === 'accelerated') {
-                            frequencyPayment = (monthlyPayment * 12) / 26;
-                          } else if (formData.paymentFrequency === 'accelerated-weekly') {
-                            frequencyPayment = (monthlyPayment * 12) / 52;
-                          }
-                          
-                          return Math.round(frequencyPayment).toLocaleString();
-                        })()}
-                      </span>{' '}
-                      and you'll need{' '}
-                      <span className="text-[#1B5E20] font-semibold">
-                        ${(() => {
-                          const cashToClose = calcCashToClose(formData.homePrice, demoData.selectedDownPaymentPercent, demoData.isFirstTimeBuyer, demoData.selectedProvince);
-                          return cashToClose.total.toLocaleString();
-                        })()}
-                      </span>{' '}
-                      to close.
-                    </p>
-                  </div>
-                  <div className="flex-shrink-0">
-                    <button className="bg-[#1B5E20] hover:bg-[#2E7D32] text-white font-semibold py-2 sm:py-3 px-4 sm:px-6 lg:px-8 rounded-lg transition-colors duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#1B5E20] focus:ring-offset-2 shadow-lg text-sm sm:text-base">
-                      Get This Rate
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </>
+            <MortgageCalculator />
+            
+            
+          </>
         )}
 
         {/* Additional Information */}
@@ -2192,6 +1231,7 @@ function Calculator() {
           </div>
         </div>
       </div>
+      
     </div>
   );
 }

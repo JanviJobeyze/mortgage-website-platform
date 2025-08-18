@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import homeServiceIcon from '../assets/Home_Service.png';
 import refiniServiceIcon from '../assets/Refinancing_Service.png';
@@ -8,90 +8,13 @@ import financialRecordsIcon from '../assets/Financial_Records.png';
 import propertyDocumentsIcon from '../assets/Property_Documents.png';
 import sarahChenImage from '../assets/Sarah Chen.png';
 import rajeshPatelImage from '../assets/Rajesh Patel.png';
+import MortgageCalculator from '../components/MortgageCalculator';
+import ContactForm from '../components/ContactForm';
 
 function Services() {
   const navigate = useNavigate();
 
-  // Calculator state
-  const [calculatorData, setCalculatorData] = useState({
-    loanType: 'Home Purchase',
-    province: 'Ontario',
-    homePrice: '',
-    downPayment: '',
-    interestRate: '',
-    amortization: '',
-    paymentFrequency: 'Monthly'
-  });
 
-  const [monthlyPayment, setMonthlyPayment] = useState('$0');
-  const [loanAmount, setLoanAmount] = useState('$0');
-  const [showResult, setShowResult] = useState(false);
-
-  // Calculate mortgage payment
-  const calculatePayment = () => {
-    const homePrice = parseFloat(calculatorData.homePrice.replace(/,/g, '')) || 0;
-    const downPayment = parseFloat(calculatorData.downPayment.replace(/,/g, '')) || 0;
-    const interestRate = parseFloat(calculatorData.interestRate) || 0;
-    const amortization = parseFloat(calculatorData.amortization) || 0;
-
-    if (homePrice <= 0 || interestRate <= 0 || amortization <= 0) {
-      setMonthlyPayment('$0');
-      setLoanAmount('$0');
-      setShowResult(false);
-      return;
-    }
-
-    const calculatedLoanAmount = homePrice - downPayment;
-    if (calculatedLoanAmount <= 0) {
-      setMonthlyPayment('$0');
-      setLoanAmount('$0');
-      setShowResult(false);
-      return;
-    }
-
-    // Convert annual interest rate to monthly rate
-    const monthlyRate = interestRate / 100 / 12;
-    const totalPayments = amortization * 12;
-
-    // Calculate monthly payment using the formula: P = L[c(1 + c)^n]/[(1 + c)^n – 1]
-    const monthlyPaymentAmount = calculatedLoanAmount * 
-      (monthlyRate * Math.pow(1 + monthlyRate, totalPayments)) / 
-      (Math.pow(1 + monthlyRate, totalPayments) - 1);
-
-    // Format the results
-    const formattedPayment = new Intl.NumberFormat('en-CA', {
-      style: 'currency',
-      currency: 'CAD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(monthlyPaymentAmount);
-
-    const formattedLoanAmount = new Intl.NumberFormat('en-CA', {
-      style: 'currency',
-      currency: 'CAD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(calculatedLoanAmount);
-
-    setMonthlyPayment(formattedPayment);
-    setLoanAmount(formattedLoanAmount);
-    setShowResult(true);
-  };
-
-  // Handle input changes
-  const handleInputChange = (field, value) => {
-    setCalculatorData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  // Format currency inputs
-  const formatCurrency = (value) => {
-    const numericValue = value.replace(/[^0-9]/g, '');
-    if (numericValue === '') return '';
-    return new Intl.NumberFormat('en-CA').format(parseInt(numericValue));
-  };
 
   useEffect(() => {
     // Set page title
@@ -289,34 +212,7 @@ function Services() {
           <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 mb-6 sm:mb-8 max-w-xs sm:max-w-lg md:max-w-2xl lg:max-w-3xl mx-auto leading-relaxed">
             From first-time homebuyer programs to refinancing and home equity loans, we offer a full range of mortgage solutions tailored to your unique financial situation.
           </p>
-          
-          {/* Province Dropdown */}
-          <div className="mb-6 sm:mb-8 flex justify-center">
-            <div className="max-w-xs w-full relative">
-              <select className="w-full px-4 sm:px-6 py-2 sm:py-3 pr-10 sm:pr-12 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 text-gray-700 bg-white appearance-none cursor-pointer text-sm sm:text-base">
-                <option value="">Select Province</option>
-                <option value="AB">Alberta</option>
-                <option value="BC">British Columbia</option>
-                <option value="MB">Manitoba</option>
-                <option value="NB">New Brunswick</option>
-                <option value="NL">Newfoundland and Labrador</option>
-                <option value="NS">Nova Scotia</option>
-                <option value="ON">Ontario</option>
-                <option value="PE">Prince Edward Island</option>
-                <option value="QC">Quebec</option>
-                <option value="SK">Saskatchewan</option>
-                <option value="NT">Northwest Territories</option>
-                <option value="NU">Nunavut</option>
-                <option value="YT">Yukon</option>
-              </select>
-              {/* Custom dropdown arrow */}
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3 sm:pr-4 pointer-events-none">
-                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-            </div>
-          </div>
+        
         </div>
       </section>
 
@@ -390,7 +286,7 @@ function Services() {
                   Learn More
                 </button>
                 <button 
-                  onClick={() => navigate('/pre-qualify')}
+                  onClick={() => navigate('/eligibility-quiz')}
                   className="w-full text-white py-2 sm:py-3 lg:py-4 rounded-lg font-medium text-xs sm:text-sm lg:text-base transition-colors duration-200" 
                   style={{backgroundColor: '#4CAF50'}} 
                   onMouseOver={(e) => {
@@ -471,7 +367,7 @@ function Services() {
                   Learn More
                 </button>
                 <button 
-                  onClick={() => navigate('/pre-qualify')}
+                  onClick={() => navigate('/eligibility-qui')}
                   className="w-full text-white py-2 sm:py-3 lg:py-4 rounded-lg font-medium text-xs sm:text-sm lg:text-base transition-colors duration-200" 
                   style={{backgroundColor: '#4CAF50'}} 
                   onMouseOver={(e) => {
@@ -744,218 +640,8 @@ function Services() {
       </section>
 
       {/* Calculate Your Payments - MAIN FEATURE */}
-      <section className="py-12 sm:py-16 md:py-20 bg-[#1B5E20]">
-        <div className="max-w-5xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
-          <div className="text-center mb-8 sm:mb-10">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">
-              Calculate Your Mortgage Payments
-            </h2>
-            <p className="text-base sm:text-lg text-[#C8E6C9] max-w-3xl mx-auto">
-              Get instant payment estimates for any of our mortgage services
-            </p>
-          </div>
-          
-          <div className="bg-white rounded-xl shadow-lg p-6 sm:p-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-              {/* Loan Type */}
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700">Loan Type</label>
-                <select 
-                  value={calculatorData.loanType}
-                  onChange={(e) => handleInputChange('loanType', e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1B5E20] focus:border-transparent text-sm appearance-none bg-white"
-                >
-                  <option>Home Purchase</option>
-                  <option>Refinancing</option>
-                  <option>Home Equity</option>
-                </select>
-              </div>
-              
-              {/* Province */}
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700">Province</label>
-                <select 
-                  value={calculatorData.province}
-                  onChange={(e) => handleInputChange('province', e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1B5E20] focus:border-transparent text-sm appearance-none bg-white"
-                >
-                  <option>Ontario</option>
-                  <option>Alberta</option>
-                  <option>British Columbia</option>
-                  <option>Manitoba</option>
-                  <option>New Brunswick</option>
-                  <option>Newfoundland and Labrador</option>
-                  <option>Nova Scotia</option>
-                  <option>Prince Edward Island</option>
-                  <option>Quebec</option>
-                  <option>Saskatchewan</option>
-                  <option>Northwest Territories</option>
-                  <option>Nunavut</option>
-                  <option>Yukon</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-              {/* Home Price / Loan Amount */}
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700">Home Price / Loan Amount</label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
-                  <input 
-                    type="text" 
-                    value={calculatorData.homePrice}
-                    onChange={(e) => handleInputChange('homePrice', formatCurrency(e.target.value))}
-                    placeholder="500,000"
-                    className="w-full pl-8 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1B5E20] focus:border-transparent text-sm"
-                  />
-                </div>
-              </div>
-              
-              {/* Down Payment */}
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700">Down Payment</label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
-                  <input 
-                    type="text" 
-                    value={calculatorData.downPayment}
-                    onChange={(e) => handleInputChange('downPayment', formatCurrency(e.target.value))}
-                    placeholder="100,000"
-                    className="w-full pl-8 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1B5E20] focus:border-transparent text-sm"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-              {/* Interest Rate */}
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700">Interest Rate (%)</label>
-                <input 
-                  type="text" 
-                  value={calculatorData.interestRate}
-                  onChange={(e) => handleInputChange('interestRate', e.target.value)}
-                  placeholder="2.89"
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1B5E20] focus:border-transparent text-sm"
-                />
-              </div>
-              
-              {/* Amortization */}
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700">Amortization (Years)</label>
-                <input 
-                  type="text" 
-                  value={calculatorData.amortization}
-                  onChange={(e) => handleInputChange('amortization', e.target.value)}
-                  placeholder="25"
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1B5E20] focus:border-transparent text-sm"
-                />
-              </div>
-              
-              {/* Payment Frequency */}
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700">Payment Frequency</label>
-                <select 
-                  value={calculatorData.paymentFrequency}
-                  onChange={(e) => handleInputChange('paymentFrequency', e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1B5E20] focus:border-transparent text-sm appearance-none bg-white"
-                >
-                  <option>Monthly</option>
-                  <option>Bi-weekly</option>
-                  <option>Weekly</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Result Display */}
-            {showResult && (
-              <div className="mb-6 p-6 bg-[#E8F5E8] border border-[#1B5E20] rounded-lg">
-                <h3 className="text-lg font-bold text-[#1B5E20] mb-4">Mortgage Calculation Results</h3>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Left Column - Key Figures */}
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center p-3 bg-white rounded-lg border border-[#1B5E20]/20">
-                      <span className="text-sm font-medium text-[#1B5E20]">Monthly Payment:</span>
-                      <span className="text-xl font-bold text-[#1B5E20]">{monthlyPayment}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center p-3 bg-white rounded-lg border border-[#1B5E20]/20">
-                      <span className="text-sm font-medium text-[#1B5E20]">Principal:</span>
-                      <span className="text-lg font-semibold text-[#1B5E20]">{loanAmount}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center p-3 bg-white rounded-lg border border-[#1B5E20]/20">
-                      <span className="text-sm font-medium text-[#1B5E20]">Down Payment:</span>
-                      <span className="text-lg font-semibold text-[#1B5E20]">
-                        {calculatorData.downPayment ? `$${calculatorData.downPayment}` : '$0'}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  {/* Right Column - Additional Details */}
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center p-3 bg-white rounded-lg border border-[#1B5E20]/20">
-                      <span className="text-sm font-medium text-[#1B5E20]">Home Price:</span>
-                      <span className="text-lg font-semibold text-[#1B5E20]">
-                        {calculatorData.homePrice ? `$${calculatorData.homePrice}` : '$0'}
-                      </span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center p-3 bg-white rounded-lg border border-[#1B5E20]/20">
-                      <span className="text-sm font-medium text-[#1B5E20]">Interest Rate:</span>
-                      <span className="text-lg font-semibold text-[#1B5E20]">
-                        {calculatorData.interestRate ? `${calculatorData.interestRate}%` : '0%'}
-                      </span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center p-3 bg-white rounded-lg border border-[#1B5E20]/20">
-                      <span className="text-sm font-medium text-[#1B5E20]">Amortization:</span>
-                      <span className="text-lg font-semibold text-[#1B5E20]">
-                        {calculatorData.amortization ? `${calculatorData.amortization} years` : '0 years'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="mt-4 p-3 bg-[#1B5E20]/10 rounded-lg">
-                  <p className="text-sm text-[#1B5E20] text-center">
-                    <span className="font-medium">Note:</span> This is an estimate. Actual rates and payments may vary based on your specific situation and lender terms.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-              <button 
-                onClick={calculatePayment}
-                className="w-full sm:w-auto px-8 py-3 bg-[#FF6F00] hover:bg-[#E65100] text-white font-semibold rounded-lg transition-colors duration-200 text-base"
-              >
-                Calculate Payment
-              </button>
-              
-              <div className="flex flex-col sm:flex-row gap-3">
-                <button className="px-6 py-2.5 text-[#1B5E20] bg-[#E8F5E8] hover:bg-[#C8E6C9] font-medium rounded-lg transition-colors duration-200 text-sm border border-[#1B5E20]">
-                  View Detailed Calculator
-                </button>
-                <button className="px-6 py-2.5 text-[#1B5E20] bg-white hover:bg-gray-50 font-medium rounded-lg transition-colors duration-200 text-sm border border-[#1B5E20]">
-                  Get Pre-Approved
-                </button>
-              </div>
-            </div>
-            
-            {/* Calculator Disclaimer */}
-            <div className="mt-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-              <p className="text-sm text-gray-600">
-                <span className="font-medium text-gray-700">Disclaimer:</span> 
-                Results are estimates only and do not constitute pre-approval or guarantee of terms. 
-                Consult with a mortgage professional for advice based on your specific situation.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+    <MortgageCalculator  isCompact={true}/>
+    
 
       {/* Required Documents */}
       <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white">
@@ -1191,135 +877,11 @@ function Services() {
             </p>
           </div>
           
-          <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 md:p-8 lg:p-10">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-4 sm:mb-6 lg:mb-8">
-              {/* First Name */}
-              <div>
-                <label className="block text-xs sm:text-sm lg:text-base font-medium mb-2" style={{color: '#757575'}}>First Name *</label>
-                <input 
-                  type="text" 
-                  placeholder="Enter your first name"
-                  className="w-full px-3 sm:px-4 lg:px-6 py-2 sm:py-3 lg:py-4 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 text-sm sm:text-base lg:text-lg"
-                  style={{color: '#212121'}}
-                />
-              </div>
-              
-              {/* Last Name */}
-              <div>
-                <label className="block text-xs sm:text-sm lg:text-base font-medium mb-2" style={{color: '#757575'}}>Last Name *</label>
-                <input 
-                  type="text" 
-                  placeholder="Enter your last name"
-                  className="w-full px-3 sm:px-4 lg:px-6 py-2 sm:py-3 lg:py-4 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 text-sm sm:text-base lg:text-lg"
-                  style={{color: '#212121'}}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-4 sm:mb-6 lg:mb-8">
-              {/* Email Address */}
-              <div>
-                <label className="block text-xs sm:text-sm lg:text-base font-medium mb-2" style={{color: '#757575'}}>Email Address *</label>
-                <input 
-                  type="email" 
-                  placeholder="your.email@example.com"
-                  className="w-full px-3 sm:px-4 lg:px-6 py-2 sm:py-3 lg:py-4 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 text-sm sm:text-base lg:text-lg"
-                  style={{color: '#212121'}}
-                />
-              </div>
-              
-              {/* Phone Number */}
-              <div>
-                <label className="block text-xs sm:text-sm lg:text-base font-medium mb-2" style={{color: '#757575'}}>Phone Number *</label>
-                <input 
-                  type="tel" 
-                  placeholder="(555) 123-4567"
-                  className="w-full px-3 sm:px-4 lg:px-6 py-2 sm:py-3 lg:py-4 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 text-sm sm:text-base lg:text-lg"
-                  style={{color: '#212121'}}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-4 sm:mb-6 lg:mb-8">
-              {/* Service Interest */}
-              <div>
-                <label className="block text-xs sm:text-sm lg:text-base font-medium mb-2" style={{color: '#757575'}}>Service Interest *</label>
-                <select className="w-full px-3 sm:px-4 lg:px-6 py-2 sm:py-3 lg:py-4 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 appearance-none text-sm sm:text-base lg:text-lg" style={{backgroundColor: '#F5F5F5', color: '#212121'}}>
-                  <option>Select a service</option>
-                  <option>Home Purchase</option>
-                  <option>Refinancing</option>
-                  <option>Home Equity</option>
-                </select>
-              </div>
-              
-              {/* Preferred Language */}
-              <div>
-                <label className="block text-xs sm:text-sm lg:text-base font-medium mb-2" style={{color: '#757575'}}>Preferred Language</label>
-                <select className="w-full px-3 sm:px-4 lg:px-6 py-2 sm:py-3 lg:py-4 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 appearance-none text-sm sm:text-base lg:text-lg" style={{backgroundColor: '#F5F5F5', color: '#212121'}}>
-                  <option>English</option>
-                  <option>French</option>
-                  <option>Mandarin</option>
-                  <option>Gujarati</option>
-                  <option>Hindi</option>
-                  <option>Punjabi</option>
-                  <option>Spanish</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Message */}
-            <div className="mb-4 sm:mb-6 lg:mb-8">
-              <label className="block text-xs sm:text-sm lg:text-base font-medium mb-2" style={{color: '#757575'}}>Message</label>
-              <textarea 
-                rows={4}
-                className="w-full px-3 sm:px-4 lg:px-6 py-2 sm:py-3 lg:py-4 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 resize-none text-sm sm:text-base lg:text-lg"
-                placeholder="Tell us about your mortgage needs or any questions you have..."
-                style={{color: '#212121'}}
-              ></textarea>
-            </div>
-
-            {/* Consent Checkbox */}
-            <div className="mb-4 sm:mb-6 lg:mb-8">
-              <label className="flex items-start">
-                <input 
-                  type="checkbox" 
-                  className="mt-1 mr-2 sm:mr-3 lg:mr-4 h-3 w-3 sm:h-4 sm:w-4 lg:h-5 lg:w-5 text-green-600 focus:ring-green-500 border-gray-300 rounded"
-                />
-                <span className="text-xs sm:text-sm lg:text-base" style={{color: '#757575'}}>
-                  I consent to being contacted by MortgageLink Canada regarding my mortgage inquiry *
-                </span>
-              </label>
-            </div>
-
-            {/* Submit Button */}
-            <button className="w-full py-3 sm:py-4 lg:py-5 rounded-lg font-semibold text-white transition-colors duration-200 mb-4 sm:mb-6 lg:mb-8 text-sm sm:text-base lg:text-lg" style={{backgroundColor: '#2E7D32'}} onMouseOver={(e) => {
-              e.target.style.backgroundColor = '#1B5E20';
-            }} onMouseOut={(e) => {
-              e.target.style.backgroundColor = '#2E7D32';
-            }}>
-              Request Consultation
-            </button>
-
-            {/* Contact Info */}
-            <div className="text-center">
-              <p className="text-xs sm:text-sm lg:text-base mb-2 sm:mb-3 lg:mb-4" style={{color: '#757575'}}>Or contact us directly</p>
-              <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-6 lg:gap-8 text-xs sm:text-sm lg:text-base">
-                <div className="flex items-center justify-center">
-                  <svg className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 mr-1 sm:mr-2 lg:mr-3" style={{color: '#2E7D32'}} fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                  </svg>
-                  <span style={{color: '#2E7D32'}}>1-800-MORTGAGE</span>
-                </div>
-                <div className="flex items-center justify-center">
-                  <svg className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 mr-1 sm:mr-2 lg:mr-3" style={{color: '#2E7D32'}} fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                  </svg>
-                  <span style={{color: '#2E7D32'}}>info@mortgagelink.ca</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <ContactForm 
+            title="Request a Consultation"
+            subtitle="Fill out the form below and we'll get back to you within 24 hours. All fields marked with * are required."
+            showToaster={true}
+          />
         </div>
       </section>
 

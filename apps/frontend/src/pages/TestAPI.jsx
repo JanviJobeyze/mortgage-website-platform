@@ -6,7 +6,7 @@ function TestAPI() {
 
   const testEndpoint = async (endpoint) => {
     try {
-      const response = await fetch(`http://localhost:5000${endpoint}`);
+      const response = await fetch(`${endpoint}`);
       const data = await response.json();
       return { success: true, data, status: response.status };
     } catch (error) {
@@ -177,7 +177,7 @@ function TestAPI() {
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-6">
           <h2 className="text-xl font-semibold mb-4 text-blue-900">Summary</h2>
           <p className="text-blue-800">
-            Your frontend is properly configured to connect to the backend API at <code className="bg-blue-100 px-2 py-1 rounded">http://localhost:5000</code>.
+            Your frontend is properly configured to connect to the backend API at <code className="bg-blue-100 px-2 py-1 rounded">/api</code> (proxied to localhost:5000).
           </p>
           <p className="text-blue-800 mt-2">
             All forms and API calls are working correctly. The application form will save data to PostgreSQL database and send email notifications.
