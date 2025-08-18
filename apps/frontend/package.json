@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "netlify-build": "npm install --legacy-peer-deps --platform=linux --arch=x64 && npm install terser --save-dev && npm rebuild @rollup/rollup-linux-x64-gnu && vite build",
+    "netlify-build": "npm install --legacy-peer-deps && npm install terser --save-dev && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },

@@ -7,12 +7,13 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   build: {
     rollupOptions: {
-      // Handle platform-specific dependencies
-      external: [
-        '@rollup/rollup-linux-x64-gnu',
-        '@rollup/rollup-darwin-x64',
-        '@rollup/rollup-win32-x64-msvc'
-      ],
+      // Skip optional platform-specific dependencies
+      onwarn(warning, warn) {
+        if (warning.code === 'MISSING_OPTIONAL_DEPENDENCY') {
+          return;
+        }
+        warn(warning);
+      }
     },
     // Use terser instead of esbuild for better compatibility
     minify: 'terser',
